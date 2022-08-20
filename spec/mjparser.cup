@@ -90,7 +90,7 @@ precedence left ELSE;
 Program ::= (Program) IDENT InitList LCB MethodDeclList RCB;
 
 InitList ::= (InitListFull) InitList InitListElem |
-			 (InitListEmpty);
+			 (InitListEmpty) ;
 
 InitListElem ::= (ConstantInit) ConstDecl |
 				 (VariableInit) VarDecl;
@@ -167,8 +167,7 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
 
 //Statements
-Statements ::= LCB StatementList RCB |
-				(SingleStatementError) error RCB:l {: parser.report_error("Izvrsen oporavak do } u liniji " + lleft, null); :};
+Statements ::= LCB StatementList RCB;
 
 StatementList ::= (StatementListFull) StatementList Statement |
 				  (StatementListEmpty) ;
