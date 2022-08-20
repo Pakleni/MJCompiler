@@ -54,11 +54,119 @@ terminal RECORD;
 //tokens
 terminal String IDENT;
 terminal Integer NUMBER;
-terminal CHAR;
-terminal BOOL;
+terminal Integer CHAR;
+terminal String BOOL;
 //operators
-terminal PLUS, MINUS, MUL, DIV, MOD, EQEQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR, EQ, INC, DEC, SEMI, COL, COMMA, DOT, LNB, RNB, LSB, RSB, LCB, RCB;
+terminal PLUS, MINUS, MUL, DIV, MOD, EQEQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR;
+terminal EQ, INC, DEC, SEMI, COL, COMMA, DOT, LNB, RNB, LSB, RSB, LCB, RCB;
 
 nonterminal Program;
+nonterminal InitList, MethodDeclList;
+nonterminal InitListElem;
+nonterminal ConstDecl;
+nonterminal ConstDeclList;
+nonterminal ConstDeclItem, ConstDeclListItem;
+nonterminal VarDecl;
+nonterminal VarDeclItemList;
+nonterminal VarDeclItem;
+nonterminal MethodDecl;
+nonterminal MethodDeclType;
+nonterminal MethodDeclArgs;
+nonterminal OptArgsList;
+nonterminal VarDeclList;
+nonterminal OptArgs;
+nonterminal OptArgsItem;
+nonterminal FormPars;
+nonterminal FormPar;
+nonterminal Type;
+nonterminal Statement;
+nonterminal SingleStatement;
+nonterminal Expr, DesignatorStatement, Condition;
+nonterminal Statements;
+nonterminal StatementList;
+precedence left ELSE;
 
-Program ::= (Program) PROG IDENT;
+//Program
+Program ::= (Program) IDENT InitList LCB MethodDeclList RCB;
+
+InitList ::= (InitListFull) InitList InitListElem |
+			 (InitListEmpty);
+
+InitListElem ::= (ConstantInit) ConstDecl |
+				 (VariableInit) VarDecl;
+
+//ConstDecl
+ConstDecl ::= (ConstDecl) CONST Type ConstDeclList SEMI;
+
+ConstDeclList ::= (ConstDeclListMultiple) ConstDeclList COMMA ConstDeclListItem |
+				  (ConstDeclListSingle) ConstDeclListItem;
+
+ConstDeclListItem ::= (ConstDeclListItem) IDENT:label EQ ConstDeclItem;
+
+ConstDeclItem ::= (ConstDeclItemNumber) NUMBER:value |
+				  (ConstDeclItemChar) CHAR:value |
+				  (ConstDeclItemBool) BOOL:value;
+
+//VarDecl
+VarDecl ::= (VarDecl) Type VarDeclItemList SEMI;
+
+VarDeclItemList ::= (VarDeclItemListMultiple) VarDeclItemList COMMA VarDeclItem |
+			    (VarDeclItemListSingle) VarDeclItem;
+
+VarDeclItem ::= (VarDeclItemItem) IDENT:label |
+			    (VarDeclItemArray) IDENT:label LSB RSB;
+
+//MethodDecl
+MethodDecl ::= (MethodDecl) MethodDeclType IDENT:label LNB MethodDeclArgs RNB VarDeclList Statements;
+
+MethodDeclType ::= (MethodDeclTypeType) Type |
+				   (MethodDeclTypeVoid) VOID;
+
+MethodDeclArgs ::=  (MethodDeclArgsBoth) FormPars COMMA OptArgsList |
+					(MethodDeclArgsOpt) OptArgsList |
+					(MethodDeclArgsForm) FormPars |
+					(MethodDeclArgsEmpty) ;
+
+OptArgsList ::= (OptArgsListMultiple) OptArgsList COMMA OptArgs |
+			    (OptArgsListSingle) OptArgs;
+
+VarDeclList ::= (VarDeclListFull) VarDeclList VarDecl |
+				(VarDeclListEmpty) ;
+//OptArgs
+OptArgs ::= (OptArgs) Type IDENT EQ OptArgsItem;
+
+OptArgsItem ::= (OptArgItemNumber) NUMBER:value |
+				(OptArgItemChar) CHAR:value |
+				(OptArgItemBool) BOOL:value;
+
+//FormPars
+FormPars ::= (FormParsMultiple) FormPars COMMA FormPar |
+			 (FormParsSingle) FormPar;
+
+FormPar ::= (FormParItem) Type IDENT:label |
+			(FormParArray) Type IDENT:label LSB RSB;
+
+//Type
+Type ::= (Type) IDENT:label;
+
+//Statement
+Statement ::= (StatementSingle) SingleStatement |
+			  (StatementMultiple) Statements;
+
+//SingleStatement
+SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEMI |
+					(IfStatement) IF LNB Condition RNB Statement |
+					(IfElseStatement) IF LNB Condition RNB Statement ELSE Statement |
+					(DoWhileStatement) DO Statement WHILE LNB Condition RNB SEMI |
+					(BreakStatement) BREAK SEMI |
+					(ContinueStatement) CONTINUE SEMI |
+					(ReturnStatement) RETURN |
+					(ReturnStatementValue) RETURN Expr |
+					(ReadStatement) READ LNB Condition RNB SEMI |
+					(PrintStatement) PRINT LNB Expr RNB SEMI |
+					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
+//Statements
+Statements ::= LCB StatementList RCB;
+
+StatementList ::= (StatementListFull) StatementList Statement |
+				  (StatementListEmpty) ;
