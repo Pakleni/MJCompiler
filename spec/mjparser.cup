@@ -160,13 +160,15 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 					(DoWhileStatement) DO Statement WHILE LNB Condition RNB SEMI |
 					(BreakStatement) BREAK SEMI |
 					(ContinueStatement) CONTINUE SEMI |
-					(ReturnStatement) RETURN |
-					(ReturnStatementValue) RETURN Expr |
+					(ReturnStatement) RETURN SEMI |
+					(ReturnStatementValue) RETURN Expr SEMI |
 					(ReadStatement) READ LNB Condition RNB SEMI |
 					(PrintStatement) PRINT LNB Expr RNB SEMI |
 					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
+
 //Statements
-Statements ::= LCB StatementList RCB;
+Statements ::= LCB StatementList RCB |
+				(SingleStatementError) error RCB:l {: parser.report_error("Izvrsen oporavak do } u liniji " + lleft, null); :};
 
 StatementList ::= (StatementListFull) StatementList Statement |
 				  (StatementListEmpty) ;

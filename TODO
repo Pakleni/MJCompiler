@@ -1,0 +1,6 @@
+errors:
+    (SingleStatementError) error SEMI:l {: parser.report_error("Izvrsen oporavak do ; u liniji " + lleft, null); :}
+    ☐ definicija globalne promenljive – ignorisati karaktere do prvog znaka ";" ili sledećeg ","
+    ☐ konstrukcija iskaza dodele – ignorisati karaktere do ";"
+    ☐ deklaracija formalnog parametra funkcije – ignorisati znakove do znaka "," ili ")"
+    ☐ logički izraz unutar if konstrukcije - ignorisati karaktere do prvog znaka ")"
