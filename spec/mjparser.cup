@@ -8,6 +8,8 @@ import rs.ac.bg.etf.pp1.ast.*;
 
 parser code {:
 
+	boolean errorDetected;
+
 	Logger log = Logger.getLogger(getClass());
    
    
@@ -27,6 +29,7 @@ parser code {:
     }
 
     public void report_error(String message, Object info) {
+		errorDetected = true;
     	StringBuilder msg = new StringBuilder(message); 
     	if (info instanceof Symbol)
             msg.append (" na liniji ").append(((Symbol)info).left);
@@ -36,6 +39,9 @@ parser code {:
 
 :}
 
+init with {:
+	errorDetected = false;
+:}
 
 scan with {:
 	Symbol s = this.getScanner().next_token();
@@ -60,7 +66,8 @@ terminal BOOL;
 terminal PLUS, MINUS, MUL, DIV, MOD, EQEQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR;
 terminal EQ, INC, DEC, SEMI, COL, COMMA, DOT, LNB, RNB, LSB, RSB, LCB, RCB;
 
-nonterminal Program;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Program;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgName;
 nonterminal InitList, MethodDeclList;
 nonterminal InitListElem;
 nonterminal ConstDecl;
@@ -69,7 +76,8 @@ nonterminal ConstDeclItem, ConstDeclListItem;
 nonterminal VarDecl;
 nonterminal VarDeclItemList;
 nonterminal VarDeclItem;
-nonterminal MethodDecl;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj MethodDecl;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj MethodTypeName;
 nonterminal MethodDeclType;
 nonterminal MethodDeclArgs;
 nonterminal OptArgsList;
@@ -78,19 +86,20 @@ nonterminal OptArgs;
 nonterminal OptArgsItem;
 nonterminal FormPars;
 nonterminal FormPar;
-nonterminal Type;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 nonterminal Statement;
 nonterminal SingleStatement;
-nonterminal Expr, DesignatorStatement, Condition;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Expr;
+nonterminal DesignatorStatement, Condition;
 nonterminal Statements;
 nonterminal StatementList;
-nonterminal Designator;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
 nonterminal Assignop;
 nonterminal ActPars;
 nonterminal CondTerm;
 nonterminal CondFact;
-nonterminal Term;
-nonterminal Factor;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Term;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Factor;
 nonterminal Relop;
 nonterminal Addop;
 nonterminal Mulop;
@@ -98,7 +107,9 @@ nonterminal DesignatorPart, FunDesignatorPart;
 precedence left ELSE;
 
 //Program
-Program ::= (Program) PROG IDENT InitList LCB MethodDeclList RCB;
+Program ::= (Program) PROG ProgName:name InitList LCB MethodDeclList RCB;
+
+ProgName ::= (ProgName) IDENT:value;
 
 MethodDeclList ::= (MethodDeclListFull) MethodDeclList MethodDecl |
 				   (MethodDeclListEmpty) ;
@@ -131,7 +142,9 @@ VarDeclItem ::= (VarDeclItemItem) IDENT:label |
 			    (VarDeclItemArray) IDENT:label LSB RSB;
 
 //MethodDecl
-MethodDecl ::= (MethodDecl) MethodDeclType IDENT:label LNB MethodDeclArgs RNB VarDeclList Statements;
+MethodDecl ::= (MethodDecl) MethodDeclType MethodTypeName:name LNB MethodDeclArgs RNB VarDeclList Statements;
+
+MethodTypeName ::= (MethodTypeName) IDENT:value;
 
 MethodDeclType ::= (MethodDeclTypeType) Type |
 				   (MethodDeclTypeVoid) VOID;
