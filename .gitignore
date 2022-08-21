@@ -3,7 +3,8 @@ bin/
 logs/
 src/rs/ac/bg/etf/pp1/*
 !src/rs/ac/bg/etf/pp1/util/Log4JUtils.java
-!src/rs/ac/bg/etf/pp1/SemanticPass.java
+!src/rs/ac/bg/etf/pp1/SemanticAnalyzer.java
+!src/rs/ac/bg/etf/pp1/Compiler.java
 spec/*
-!spec/mjlexer.lex
+!spec/mjlexer.flex
 !spec/mjparser.cup

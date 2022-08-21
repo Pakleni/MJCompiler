@@ -6,7 +6,7 @@ import rs.ac.bg.etf.pp1.ast.*;
 import rs.etf.pp1.symboltable.*;
 import rs.etf.pp1.symboltable.concepts.*;
 
-public class SemanticPass extends VisitorAdaptor {
+public class SemanticAnalyzer extends VisitorAdaptor {
 
 	int printCallCount = 0;
 	int varDeclCount = 0;
@@ -14,29 +14,28 @@ public class SemanticPass extends VisitorAdaptor {
 	boolean returnFound = false;
 	boolean errorDetected = false;
 	int nVars;
-	
+
 	Logger log = Logger.getLogger(getClass());
 
 	public void report_error(String message, SyntaxNode info) {
 		errorDetected = true;
 		StringBuilder msg = new StringBuilder(message);
-		int line = (info == null) ? 0: info.getLine();
+		int line = (info == null) ? 0 : info.getLine();
 		if (line != 0)
-			msg.append (" na liniji ").append(line);
+			msg.append(" na liniji ").append(line);
 		log.error(msg.toString());
 	}
 
 	public void report_info(String message, SyntaxNode info) {
-		StringBuilder msg = new StringBuilder(message); 
-		int line = (info == null) ? 0: info.getLine();
+		StringBuilder msg = new StringBuilder(message);
+		int line = (info == null) ? 0 : info.getLine();
 		if (line != 0)
-			msg.append (" na liniji ").append(line);
+			msg.append(" na liniji ").append(line);
 		log.info(msg.toString());
 	}
-    
-    
-    public boolean passed(){
-    	return !errorDetected;
-    }
-    
+
+	public boolean passed() {
+		return !errorDetected;
+	}
+
 }

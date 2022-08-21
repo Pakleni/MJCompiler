@@ -4,3 +4,79 @@ errors:
     ☐ konstrukcija iskaza dodele – ignorisati karaktere do ";"
     ☐ deklaracija formalnog parametra funkcije – ignorisati znakove do znaka "," ili ")"
     ☐ logički izraz unutar if konstrukcije - ignorisati karaktere do prvog znaka ")"
+
+detect usage:
+    ☐ pristup elementu niza
+    ☐ globalne promenljive
+    ☐ lokalne promenljive
+    ☐ globalne funkcije (pozivi)
+    ☐ korišćenje formalnog argumenta funkcije
+
+contextual conditions:
+    Opšti:
+        ☐ Svako ime u programu mora biti deklarisano pre prvog korišćenja
+        ☐ Ime ne sme biti deklarisano više puta unutar istog opsega
+        ☐ U programu mora postojati metoda sa imenom main. Ona mora biti deklarisana kao void metoda bez argumenata.
+    standardne metode:
+        ☐ chr(e) e mora biti izraz tipa int.
+        ☐ ord(c) c mora biti tipa char.
+        ☐ len(a) a mora biti niz ili znakovni niz.
+    ConstDecl = ʺconstʺ Type ident ʺ=ʺ (numConst | charConst | boolConst) ʺ;ʺ.:
+        ☐ Tip terminala numConst, charConst ili boolConst mora biti ekvivalentan tipu Type
+    MethodDecl = (Type | ʺvoidʺ) ident ʺ(ʺ [FormPars] ʺ)ʺ {VarDecl} ʺ{ʺ {Statement} ʺ}ʺ.:
+        ☐ Ako metoda nije tipa void, mora imati iskaz return unutar svog tela (uslov treba da se proverava u vreme izvršavanja programa).
+    Type = ident.:
+        ☐ ident mora označavati tip podataka
+    DesignatorStatement = Designator Assignop Expr ʺ;ʺ.:
+        ☐ Designator mora označavati promenljivu, element niza ili polje unutar objekta.
+        ☐ Tip neterminala Expr mora biti kompatibilan pri dodeli sa tipom neterminala Designator.
+    DesignatorStatement = Designator (ʺ++ʺ | ʺ‐‐ʺ) ʺ;ʺ.:
+        ☐ Designator mora označavati promenljivu, element niza.
+        ☐ Designator mora biti tipa int.
+    DesignatorStatement = Designator ʺ(ʺ [ActPars] ʺ)ʺ ʺ;ʺ.:
+        ☐ Designator mora označavati globalnu funkciju glavnog programa.
+    SingleStatement = ʺbreakʺ.:
+        ☐ Iskaz break se može koristiti samo unutar do-while petlje. Prekida izvršavanje neposredno okružujuće do-while petlje.
+    SingleStatement = ʺcontinueʺ.:
+        ☐ Iskaz continue se može koristiti samo unutar do-while petlje. Prekida tekuću iteraciju neposredno okružujuće petlje
+    SingleStatement = ʺreadʺ ʺ(ʺ Designator ʺ)ʺ ʺ;ʺ.:
+        ☐ Designator mora označavati promenljivu, element niza ili polje unutar objekta.
+        ☐ Designator mora biti tipa int, char ili bool.
+    SingleStatement = ʺprintʺ ʺ(ʺ Expr [ʺ,ʺ numConst] ʺ)ʺ ʺ;ʺ.:
+        ☐ Expr mora biti tipa int, char ili bool
+    SingleStatement = ʺreturnʺ [Expr] .:
+        ☐ Tip neterminala Expr mora biti ekvivalentan povratnom tipu tekuće metode/ globalne funkcije.
+        ☐ Ako neterminal Expr nedostaje, tekuća metoda mora biti deklarisana kao void.
+        ☐ Ne sme postojati izvan tela (statičkih) metoda, odnosno globalnih funkcija.
+    SingleStatement = ʺifʺ ʺ(ʺ Condition ʺ)ʺ Statement [ʺelseʺ Statement].:
+        ☐ Naredba if – ukoliko je vrednost uslovnog izraza Condition true, izvršavaju se naredbe u if grani, u suprotnom izvršavaju se naredbe u else grani, ako je navedena.
+        ☐ Tip uslovnog izraza Condition mora biti bool.
+    SingleStatement = ʺdoʺ {Statement} ʺwhileʺ ʺ(ʺ Condition ʺ)ʺ ʺ;ʺ .:
+        ☐ Uslovni izraz Condition mora biti tipa bool.
+        ☐ Po završetku tela petlje (osim ukoliko se ne naiđe na break) proverava se zadati uslov. Ukoliko je uslov ispunjen skače se na početak petlje, dok se u suprotnom izlazi iz petlje.
+    ActPars = Expr {ʺ,ʺ Expr}.:
+        ☐ Broj formalnih i stvarnih argumenata metode mora biti isti.
+        ☐ Tip svakog stvarnog argumenta mora biti kompatibilan pri dodeli sa tipom svakog formalnog argumenta na odgovarajućoj poziciji.
+    CondFact = Expr Relop Expr.:
+        ☐ Tipovi oba izraza moraju biti kompatibilni.
+        ☐ Uz promenljive tipa niza, od relacionih operatora, mogu se koristiti samo != i ==.
+    Expr = ʺ‐ʺ Term.:
+        ☐ Term mora biti tipa int.
+    Expr = Expr Addop Term.:
+        ☐ Expr i Term moraju biti tipa int. U svakom slučaju, tipovi za Expr i Term moraju biti komatibilni.
+    Term = Term Mulop Factor.:
+        ☐ Term i Factor moraju biti tipa int.
+    Factor = Designator ʺ(ʺ [ActPars] ʺ)ʺ.:
+        ☐ Designator mora označavati globalnu funkciju glavnog programa.
+        ☐ Ukoliko Designator predstavlja konstruktor, nema parametre.
+    Factor = ʺnewʺ Type ʺ[ʺ Expr ʺ]ʺ.:
+        ☐ Tip neterminala Expr mora biti int.
+    Designator = Designator ʺ[ʺ Expr ʺ]ʺ.:
+        ☐ Tip neterminala Designator mora biti niz.
+        ☐ Tip neterminala Expr mora biti int.
+    Assignop = ʺ=ʺ.:
+        ☐ Operator dodele vrednosti je desno asocijativan.
+    Addop = ʺ+ʺ | ʺ‐ʺ.:
+        ☐ Operatori su levo asocijativni.
+    Mulop = ʺ*ʺ | ʺ/ʺ | ʺ%ʺ.:
+        ☐ Operatori su levo asocijativni.
