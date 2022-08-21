@@ -1,9 +1,9 @@
 errors:
     (SingleStatementError) error SEMI:l {: parser.report_error("Izvrsen oporavak do ; u liniji " + lleft, null); :}
-    ☐ definicija globalne promenljive – ignorisati karaktere do prvog znaka ";" ili sledećeg ","
-    ☐ konstrukcija iskaza dodele – ignorisati karaktere do ";"
-    ☐ deklaracija formalnog parametra funkcije – ignorisati znakove do znaka "," ili ")"
-    ☐ logički izraz unutar if konstrukcije - ignorisati karaktere do prvog znaka ")"
+    ✔ definicija globalne promenljive – ignorisati karaktere do prvog znaka ";" ili sledećeg "," @done(22-08-21 22:24)
+    ✔ konstrukcija iskaza dodele – ignorisati karaktere do ";" @done(22-08-21 23:17)
+    ✔ deklaracija formalnog parametra funkcije – ignorisati znakove do znaka "," ili ")" @done(22-08-21 23:46)
+    ✔ logički izraz unutar if konstrukcije - ignorisati karaktere do prvog znaka ")" <- Condition @done(22-08-21 23:29)
 
 detect usage:
     ☐ pristup elementu niza
@@ -68,7 +68,6 @@ contextual conditions:
         ☐ Term i Factor moraju biti tipa int.
     Factor = Designator ʺ(ʺ [ActPars] ʺ)ʺ.:
         ☐ Designator mora označavati globalnu funkciju glavnog programa.
-        ☐ Ukoliko Designator predstavlja konstruktor, nema parametre.
     Factor = ʺnewʺ Type ʺ[ʺ Expr ʺ]ʺ.:
         ☐ Tip neterminala Expr mora biti int.
     Designator = Designator ʺ[ʺ Expr ʺ]ʺ.:

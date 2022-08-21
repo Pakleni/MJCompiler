@@ -1,0 +1,71 @@
+program p
+const int size = 10;
+int pace, ogi[];
+interror;
+const integererer;
+boolean pace_bool, gioBool;
+{
+    void f(char ch, int a, int arg, int pace=2) int x;
+    {
+        x = arg;
+        print(-pace+1);
+    }
+    
+    void f2(char ch, inta, int arg, intpace=2) int x;
+    {
+        x = arg;
+        print(-pace+1);
+    }
+
+    void main() int x, i; char c;
+    {
+        ogi = new int [size];
+        
+        read(x);
+
+        if(x > 5)
+        {
+        	pace_Bool = true;
+        	c = 'c';
+        }
+        
+        if(x > 5 <)
+        {
+        	pace_Bool = true;
+        	c = 'c';
+        }
+        
+        if(x > 5 >)
+        {
+        	pace_Bool = true;
+        	c = 'c';
+        }
+        else {
+        }
+		
+		c = 2 + ;
+		
+        i = 0;
+        
+        do{
+         i++;
+         print(-i);
+        }while(i<size);
+
+        f(c, x, i);
+        f(c, x, i, 3);
+
+        do{
+			if(x <= 0) break;
+			if (0 <= x && x < size)
+			{
+		    	print('a');
+		    }
+		    else if (-size < x && x < 0)
+		    {
+		    	print('b');
+		    }
+		    read(x);
+		}while(true);
+    }
+}

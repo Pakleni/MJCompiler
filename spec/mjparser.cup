@@ -104,6 +104,8 @@ nonterminal Relop;
 nonterminal Addop;
 nonterminal Mulop;
 nonterminal DesignatorPart, FunDesignatorPart;
+nonterminal DesignatorPartAssignPart;
+nonterminal IfCondition;
 precedence left ELSE;
 
 //Program
@@ -118,7 +120,8 @@ InitList ::= (InitListFull) InitList InitListElem |
 			 (InitListEmpty) ;
 
 InitListElem ::= (ConstantInit) ConstDecl |
-				 (VariableInit) VarDecl;
+				 (VariableInit) VarDecl |
+				 (InitListElemError) error SEMI:l {: parser.report_error("Izvrsen oporavak definicije globalne promenljive do ; u liniji " + lleft, null); :};
 
 //ConstDecl
 ConstDecl ::= (ConstDecl) CONST Type ConstDeclList SEMI;
@@ -152,7 +155,8 @@ MethodDeclType ::= (MethodDeclTypeType) Type |
 MethodDeclArgs ::=  (MethodDeclArgsBoth) FormPars COMMA OptArgsList |
 					(MethodDeclArgsOpt) OptArgsList |
 					(MethodDeclArgsForm) FormPars |
-					(MethodDeclArgsEmpty) ;
+					(MethodDeclArgsEmpty) |
+					(MethodDeclArgsError) error:l {: parser.report_error("Izvrsen oporavak deklaracija formalnog parametra funkcije do , ili ) u liniji " + lleft, null); :};
 
 OptArgsList ::= (OptArgsListMultiple) OptArgsList COMMA OptArgs |
 			    (OptArgsListSingle) OptArgs;
@@ -181,9 +185,10 @@ Statement ::= (StatementSingle) SingleStatement |
 			  (StatementMultiple) Statements;
 
 //SingleStatement
+
 SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEMI |
-					(IfStatement) IF LNB Condition RNB Statement |
-					(IfElseStatement) IF LNB Condition RNB Statement ELSE Statement |
+					(IfStatement) IF LNB IfCondition RNB Statement |
+					(IfElseStatement) IF LNB IfCondition RNB Statement ELSE Statement |
 					(DoWhileStatement) DO Statement WHILE LNB Condition RNB SEMI |
 					(BreakStatement) BREAK SEMI |
 					(ContinueStatement) CONTINUE SEMI |
@@ -192,6 +197,10 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 					(ReadStatement) READ LNB Designator RNB SEMI |
 					(PrintStatement) PRINT LNB Expr RNB SEMI |
 					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
+
+IfCondition ::= (IfConditionMultiple) IfCondition OR CondTerm |
+			    (IfConditionSingle) CondTerm |
+				(IfConditionError) error:l {: parser.report_error("Izvrsen oporavak logičkog izraza unutar if konstrukcije do ) u liniji " + lleft, null); :};
 
 //Statements
 Statements ::= LCB StatementList RCB;
@@ -203,10 +212,14 @@ StatementList ::= (StatementListFull) StatementList Statement |
 
 DesignatorStatement ::= (DesignatorStatement) Designator DesignatorPart;
 
-DesignatorPart ::= (DesignatorPartAssign) Assignop Expr |
+DesignatorPart ::= (DesignatorPartAssign) Assignop DesignatorPartAssignPart |
 				   (DesignatorPartFun) LNB FunDesignatorPart RNB |
 				   (DesignatorPartInc) INC |
 				   (DesignatorPartDec) DEC;
+
+DesignatorPartAssignPart ::= (DesignatorPartAssignPartExpr) Expr |
+						 	 (DesignatorPartAssignPartError) error:l {: parser.report_error("Izvrsen oporavak konstrukcija iskaza dodele do ; u liniji " + lleft, null); :};
+
 
 FunDesignatorPart ::= (FunDesignatorPartFull) ActPars |
 					  (FunDesignatorPartEmpty) ;
