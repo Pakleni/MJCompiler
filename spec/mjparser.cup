@@ -54,8 +54,8 @@ terminal RECORD;
 //tokens
 terminal String IDENT;
 terminal Integer NUMBER;
-terminal Integer CHAR;
-terminal String BOOL;
+terminal CHAR;
+terminal BOOL;
 //operators
 terminal PLUS, MINUS, MUL, DIV, MOD, EQEQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR;
 terminal EQ, INC, DEC, SEMI, COL, COMMA, DOT, LNB, RNB, LSB, RSB, LCB, RCB;
@@ -84,10 +84,24 @@ nonterminal SingleStatement;
 nonterminal Expr, DesignatorStatement, Condition;
 nonterminal Statements;
 nonterminal StatementList;
+nonterminal Designator;
+nonterminal Assignop;
+nonterminal ActPars;
+nonterminal CondTerm;
+nonterminal CondFact;
+nonterminal Term;
+nonterminal Factor;
+nonterminal Relop;
+nonterminal Addop;
+nonterminal Mulop;
+nonterminal DesignatorPart, FunDesignatorPart;
 precedence left ELSE;
 
 //Program
-Program ::= (Program) IDENT InitList LCB MethodDeclList RCB;
+Program ::= (Program) PROG IDENT InitList LCB MethodDeclList RCB;
+
+MethodDeclList ::= (MethodDeclListFull) MethodDeclList MethodDecl |
+				   (MethodDeclListEmpty) ;
 
 InitList ::= (InitListFull) InitList InitListElem |
 			 (InitListEmpty) ;
@@ -162,7 +176,7 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 					(ContinueStatement) CONTINUE SEMI |
 					(ReturnStatement) RETURN SEMI |
 					(ReturnStatementValue) RETURN Expr SEMI |
-					(ReadStatement) READ LNB Condition RNB SEMI |
+					(ReadStatement) READ LNB Designator RNB SEMI |
 					(PrintStatement) PRINT LNB Expr RNB SEMI |
 					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
 
@@ -171,3 +185,85 @@ Statements ::= LCB StatementList RCB;
 
 StatementList ::= (StatementListFull) StatementList Statement |
 				  (StatementListEmpty) ;
+
+//DesignatorStatement
+
+DesignatorStatement ::= (DesignatorStatement) Designator DesignatorPart;
+
+DesignatorPart ::= (DesignatorPartAssign) Assignop Expr |
+				   (DesignatorPartFun) LNB FunDesignatorPart RNB |
+				   (DesignatorPartInc) INC |
+				   (DesignatorPartDec) DEC;
+
+FunDesignatorPart ::= (FunDesignatorPartFull) ActPars |
+					  (FunDesignatorPartEmpty) ;
+
+//ActPars
+
+ActPars ::= (ActParsMultiple) ActPars COMMA Expr |
+			(ActParsSingle) Expr;
+
+//Condition
+
+Condition ::= (ConditionMultiple) Condition OR CondTerm |
+			  (ConditionSingle) CondTerm;
+
+//CondTerm
+
+CondTerm ::= (CondTermMultiple) CondTerm AND CondFact |
+			 (CondTermSingle) CondFact;
+
+//CondFact
+
+CondFact ::= (CondFactTwo) Expr Relop Expr |
+			 (CondFactSingle) Expr; 
+
+//Expr
+
+Expr ::= (ExprMultiple) Expr Addop Term |
+		 (ExprNeg) MINUS Term |
+		 (ExprPos) Term;
+   
+//Term
+
+Term ::= (TermMultiple) Term Mulop Factor |
+		 (TermSingle) Factor;
+
+//Factor
+
+Factor ::=  (FactorDesignator) Designator |
+			(FactorDesignatorFun) Designator LNB FunDesignatorPart RNB |
+			(FactorNumber) NUMBER |
+			(FactorChar) CHAR |
+			(FactorBool) BOOL |
+			(FactorNewArr) NEW Type LSB Expr RSB |
+			(FactorExpr) LNB Expr RNB;
+
+//Designator
+
+Designator ::= (DesignatorIdent) Designator LSB Expr RSB |
+			   (DesignatorSingle) IDENT ;
+
+//Assignop
+
+Assignop ::= (Assignop) EQ;
+
+//Relop
+
+Relop ::= (RelopEQEQ) EQEQ |
+		  (RelopNEQ) NEQ |
+		  (RelopGR) GR |
+		  (RelopGREQ) GREQ |
+		  (RelopLS) LS |
+		  (RelopLSEQ) LSEQ;
+
+//Addop
+
+Addop ::= (AddopPLUS) PLUS |
+		  (AddopMINUS) MINUS;
+
+//Mulop
+
+Mulop ::= (MulopMUL) MUL |
+		  (MulopDIV) DIV |
+		  (MulopMOD) MOD;
