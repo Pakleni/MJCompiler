@@ -60,8 +60,8 @@ terminal RECORD;
 //tokens
 terminal String IDENT;
 terminal Integer NUMBER;
-terminal CHAR;
-terminal BOOL;
+terminal Integer CHAR;
+terminal Integer BOOL;
 //operators
 terminal PLUS, MINUS, MUL, DIV, MOD, EQEQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR;
 terminal EQ, INC, DEC, SEMI, COL, COMMA, DOT, LNB, RNB, LSB, RSB, LCB, RCB;
@@ -72,20 +72,21 @@ nonterminal InitList, MethodDeclList;
 nonterminal InitListElem;
 nonterminal ConstDecl;
 nonterminal ConstDeclList;
-nonterminal ConstDeclItem, ConstDeclListItem;
+nonterminal ConstDeclItem;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ConstDeclListItem;
 nonterminal VarDecl;
 nonterminal VarDeclItemList;
-nonterminal VarDeclItem;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj VarDeclItem;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj MethodDecl;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj MethodTypeName;
 nonterminal MethodDeclType;
 nonterminal MethodDeclArgs;
 nonterminal OptArgsList;
 nonterminal VarDeclList;
-nonterminal OptArgs;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj OptArgs;
 nonterminal OptArgsItem;
 nonterminal FormPars;
-nonterminal FormPar;
+nonterminal rs.etf.pp1.symboltable.concepts.Obj FormPar;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 nonterminal Statement;
 nonterminal SingleStatement;
@@ -164,7 +165,7 @@ OptArgsList ::= (OptArgsListMultiple) OptArgsList COMMA OptArgs |
 VarDeclList ::= (VarDeclListFull) VarDeclList VarDecl |
 				(VarDeclListEmpty) ;
 //OptArgs
-OptArgs ::= (OptArgs) Type IDENT EQ OptArgsItem;
+OptArgs ::= (OptArgs) Type IDENT:label EQ OptArgsItem;
 
 OptArgsItem ::= (OptArgItemNumber) NUMBER:value |
 				(OptArgItemChar) CHAR:value |

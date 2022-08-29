@@ -8,6 +8,7 @@
 				<exclude name="Yylex.java"/>
 				<exclude name="SemanticAnalyzer.java"/>
 				<exclude name="Compiler.java"/>
+				<exclude name="Method.java"/>
 			</fileset>
 		</delete>
 		<delete>
