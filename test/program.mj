@@ -1,7 +1,8 @@
 program p
 const int size = 10;
 int pace, ogi[];
-boolean pace_bool, gioBool;
+bool pace_bool, gioBool;
+char karakter;
 {
     void f(char ch, int a, int arg, int pace=2) int x;
     {
@@ -17,7 +18,7 @@ boolean pace_bool, gioBool;
 
         if(x > 5)
         {
-        	pace_Bool = true;
+        	pace_bool = false;
         	c = 'c';
         }
 

@@ -88,9 +88,10 @@ import java_cup.runtime.Symbol;
 <COMMENT> . {yybegin(COMMENT);}
 <COMMENT> "\r\n" { yybegin(YYINITIAL); }
 
-([a-z]|[A-Z])[a-z|A-Z|0-9|_]* 	{return new_symbol (sym.IDENT, yytext()); }
 [0-9]+  { return new_symbol(sym.NUMBER, new Integer (yytext())); }
-"'"[ -~]"'"  {return new_symbol (sym.CHAR, yytext()); }
-("true"|"false")  {return new_symbol (sym.BOOL, yytext()); }
+"'"[ -~]"'"  {return new_symbol (sym.CHAR, yytext().charAt(1)); }
+(true | false)  {return new_symbol (sym.BOOL, Boolean.parseBoolean(yytext()) ? 1 : 0); }
+([a-z]|[A-Z])[a-z|A-Z|0-9|_]* 	{return new_symbol (sym.IDENT, yytext()); }
+
 
 . { System.err.println("Leksicka greska ("+yytext()+") u liniji "+(yyline+1)); }

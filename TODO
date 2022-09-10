@@ -79,3 +79,6 @@ contextual conditions:
         ☐ Operatori su levo asocijativni.
     Mulop = ʺ*ʺ | ʺ/ʺ | ʺ%ʺ.:
         ☐ Operatori su levo asocijativni.
+
+Ask:
+    ☐ currentMethod.setLevel(parCounter); <- da li ce ovo da mi pokvari sve zbog opcionih parametara?

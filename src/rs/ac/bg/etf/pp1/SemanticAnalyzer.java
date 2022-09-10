@@ -6,6 +6,11 @@ import rs.ac.bg.etf.pp1.ast.*;
 import rs.etf.pp1.symboltable.*;
 import rs.etf.pp1.symboltable.concepts.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Stack;
+
 public class SemanticAnalyzer extends VisitorAdaptor {
 
 	int printCallCount = 0;
@@ -45,7 +50,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Tab.openScope();
 	}
 
-	// region "Type Visits"
+	// region "Type"
 	Struct temporaryType = null;
 
 	public void visit(Type type) {
@@ -66,7 +71,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 	// endregion
 
-	// region "Method Visits"
+	// region "Method"
 	Struct tempMethodType = null;
 
 	public void visit(MethodDecl methodDecl) {
@@ -77,6 +82,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		Tab.chainLocalSymbols(currentMethod);
 		Tab.closeScope();
+
+		// currentMethod.setLevel(parCounter);
 
 		returnFound = false;
 		currentMethod = null;
@@ -123,7 +130,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 	// endregion
 
-	// region "Variable Visits"
+	// region "Variable Declaration"
 	public void visit(ConstDeclListItem constDeclListItem) {
 
 		ConstDeclItem constDeclItem = constDeclListItem.getConstDeclItem();
@@ -152,15 +159,23 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(VarDeclItemItem varDeclItemItem) {
 		varDeclItemItem.obj = Tab.insert(Obj.Var, varDeclItemItem.getLabel(), temporaryType);
+
+		int level = currentMethod == null ? 0 : 1;
+
+		varDeclItemItem.obj.setLevel(level);
 	}
 
 	public void visit(VarDeclItemArray varDeclItemArray) {
 		varDeclItemArray.obj = Tab.insert(Obj.Var, varDeclItemArray.getLabel(),
 				new Struct(Struct.Array, temporaryType));
+
+		int level = currentMethod == null ? 0 : 1;
+
+		varDeclItemArray.obj.setLevel(level);
 	}
 	// endregion
 
-	// region "Parameter Visits"
+	// region "Method Parameters"
 	int optCounter = 0;
 	int parCounter = 0;
 
@@ -208,11 +223,163 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 	// endregion
 
-	// TODO: expr
+	// region "Expr"
+	public void visit(FactorNumber factorNumber) {
+		factorNumber.struct = Tab.intType;
+	}
+
+	public void visit(FactorChar factorChar) {
+		factorChar.struct = Tab.charType;
+	}
+
+	public void visit(FactorBool factorBool) {
+		factorBool.struct = new Struct(Struct.Bool);
+	}
+
+	public void visit(FactorNewArr factorNewArr) {
+		Struct type = factorNewArr.getType().struct;
+		factorNewArr.struct = new Struct(Struct.Array, type);
+		if (!Tab.intType.equals(factorNewArr.getExpr().struct)) {
+			report_error("Velicina alokacije mora biti int tip", factorNewArr);
+		}
+	}
+
+	public void visit(FactorExpr factorExpr) {
+		factorExpr.struct = factorExpr.getExpr().struct;
+	}
+
+	public void visit(FactorDesignator factorDesignator) {
+		factorDesignator.struct = factorDesignator.getDesignator().obj.getType();
+	}
+
+	public void visit(FactorDesignatorFun factorDesignatorFun) {
+		Designator designator = factorDesignatorFun.getDesignator();
+
+		factorDesignatorFun.struct = designator.obj.getType();
+
+		if (designator instanceof DesignatorIdent) {
+			report_error("Ne znam kako da pristup ovome a[3]()", factorDesignatorFun);
+			return;
+		}
+		String label = designator.obj.getName();
+
+		checkParams(label, factorDesignatorFun);
+	}
+
+	public void visit(TermSingle termSingle) {
+		termSingle.struct = termSingle.getFactor().struct;
+	}
+
+	public void visit(TermMultiple termMultiple) {
+		termMultiple.struct = termMultiple.getTerm().struct;
+
+		if (!termMultiple.struct.equals(termMultiple.getFactor().struct)) {
+			report_error("Ne poklapaju se tipovi sa leve i desne strane mulop-a", termMultiple);
+		}
+	}
+
+	public void visit(ExprPos exprPos) {
+		exprPos.struct = exprPos.getTerm().struct;
+	}
+
+	public void visit(ExprNeg exprNeg) {
+		exprNeg.struct = exprNeg.getTerm().struct;
+	}
+
+	public void visit(ExprMultiple exprMultiple) {
+		exprMultiple.struct = exprMultiple.getExpr().struct;
+
+		if (!exprMultiple.struct.equals(exprMultiple.getTerm().struct)) {
+			report_error("Ne poklapaju se tipovi sa leve i desne strane addop-a", exprMultiple);
+		}
+	}
+	// endregion
+
+	// region "Designator"
+	public Stack<List<Struct>> designatorParamStack = new Stack<>();
+
+	public void visit(DesignatorIdent designatorIdent) {
+		Designator designator = designatorIdent.getDesignator();
+		Struct type = designator.obj.getType();
+
+		if (type.getKind() != Struct.Array) {
+			report_error("Nije niz", designatorIdent);
+		}
+
+		if (!Tab.intType.equals(designatorIdent.getExpr().struct)) {
+			report_error("Velicina alokacije mora biti int tip", designatorIdent);
+		}
+
+		Struct elemType = type.getElemType();
+
+		designatorIdent.obj = new Obj(Obj.Elem, designator.obj.getName(), elemType);
+	}
+
+	public void visit(DesignatorSingle designatorSingle) {
+		String label = designatorSingle.getLabel();
+		Obj obj = Tab.find(label);
+		designatorSingle.obj = obj;
+
+		if (Tab.noObj.equals(obj)) {
+			report_error("Nije definisana promenljiva sa tim imenom", designatorSingle);
+			return;
+		}
+	}
+
+	public void visit(FunDesignatorPartEmpty funDesignatorPartEmpty) {
+		designatorParamStack.push(new ArrayList<>());
+	}
+
+	public void visit(ActParsSingle actParsSingle) {
+		designatorParamStack.push(new ArrayList<>());
+		designatorParamStack.peek().add(actParsSingle.getExpr().struct);
+	}
+
+	public void visit(ActParsMultiple actParsMultiple) {
+		designatorParamStack.peek().add(actParsMultiple.getExpr().struct);
+	}
+	// endregion
 
 	// TODO: statement
 
 	// TODO: conditions
+
+	// region "Helpers"
+	public void checkParams(String label, SyntaxNode syntaxNode) {
+		Obj obj = Tab.find(label);
+
+		if (Tab.noObj.equals(obj) || obj.getKind() != Obj.Meth) {
+			report_error("Nije pravilno ime metode", syntaxNode);
+			return;
+		}
+
+		Method meth = Method.globalna_lista.get(label);
+		List<Struct> params = designatorParamStack.pop();
+
+		if (params.size() > meth.size() || params.size() < meth.for_param_size) {
+			report_error("Nije dobar broj parametara", syntaxNode);
+			return;
+		}
+
+		Collection<Obj> coll = obj.getLocalSymbols();
+
+		for (Obj sym : coll) {
+			int i;
+
+			if (sym.getFpPos() > 0) {
+				i = sym.getFpPos() - 1;
+			} else if (sym.getFpPos() < 0) {
+				i = meth.for_param_size - sym.getFpPos() - 1;
+			} else {
+				return;
+			}
+
+			if (!sym.getType().equals(params.get(i))) {
+				report_error("Parametar " + i + " se ne poklapa sa definicjom funkcije", syntaxNode);
+			}
+		}
+	}
+	// endregion
 
 	public boolean passed() {
 		return !errorDetected;

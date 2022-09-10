@@ -60,7 +60,7 @@ terminal RECORD;
 //tokens
 terminal String IDENT;
 terminal Integer NUMBER;
-terminal Integer CHAR;
+terminal Character CHAR;
 terminal Integer BOOL;
 //operators
 terminal PLUS, MINUS, MUL, DIV, MOD, EQEQ, NEQ, GR, GREQ, LS, LSEQ, AND, OR;
@@ -269,7 +269,7 @@ Factor ::=  (FactorDesignator) Designator |
 //Designator
 
 Designator ::= (DesignatorIdent) Designator LSB Expr RSB |
-			   (DesignatorSingle) IDENT ;
+			   (DesignatorSingle) IDENT: label;
 
 //Assignop
 
