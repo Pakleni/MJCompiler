@@ -6,10 +6,10 @@ errors:
     ✔ logički izraz unutar if konstrukcije - ignorisati karaktere do prvog znaka ")" <- Condition @done(22-08-21 23:29)
 
 detect usage:
-    ☐ pristup elementu niza
-    ☐ globalne promenljive
-    ☐ lokalne promenljive
-    ☐ globalne funkcije (pozivi)
+    ✔ pristup elementu niza @done(22-09-11 00:46)
+    ✔ globalne promenljive @done(22-09-11 00:50)
+    ✔ lokalne promenljive @done(22-09-11 00:50)
+    ✔ globalne funkcije (pozivi) @done(22-09-11 00:55)
     ☐ korišćenje formalnog argumenta funkcije
 
 contextual conditions:

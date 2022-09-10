@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
+import rs.etf.pp1.symboltable.visitors.DumpSymbolTableVisitor;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
@@ -65,8 +66,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		MyTab.chainLocalSymbols(currentMethod);
 		MyTab.closeScope();
 		higherLevel();
-
-		// currentMethod.setLevel(parCounter);
 
 		if ("main".equals(currentMethod.getName()) && MyTab.noType.equals(currentMethod.getType()) && parCounter == 0
 				&& optCounter == 0) {
@@ -239,6 +238,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		factorDesignatorFun.struct = designator.obj.getType();
 
+		detect_usage("Upotreba funkcije kao faktor", designator.obj.getName(), factorDesignatorFun);
+
 		if (designator instanceof DesignatorIdent) {
 			report_error("Designator mora biti ime funkcije", factorDesignatorFun);
 			return;
@@ -306,6 +307,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Designator designator = designatorIdent.getDesignator();
 		Struct type = designator.obj.getType();
 
+		detect_usage("pristup elementu niza", designator.obj.getName(), designatorIdent);
+
 		if (type.getKind() != Struct.Array) {
 			report_error("Nije niz", designatorIdent);
 			return;
@@ -329,6 +332,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (MyTab.noObj.equals(obj)) {
 			report_error("Nije definisana promenljiva sa tim imenom", designatorSingle);
 			return;
+		}
+
+		if (obj.getKind() == Obj.Var) {
+			detect_usage(obj.getLevel() == 0 ? "upotreba globalne promenljive" : "upotreba lokalne promenljive", label,
+					designatorSingle);
 		}
 	}
 
@@ -433,6 +441,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			report_error("Designator mora oznacavati promenljivu, element niza", designatorPartFun);
 			return;
 		}
+
+		detect_usage("Upotreba funkcije kao statement", designator.obj.getName(), designatorPartFun);
 
 		String label = designator.obj.getName();
 
@@ -661,6 +671,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		log.info(msg.toString());
 	}
 
+	public void detect_usage(String message, String label, SyntaxNode info) {
+		StringBuilder msg = new StringBuilder(message);
+		msg.append(", naziv: ").append(label);
+		int line = (info == null) ? 0 : info.getLine();
+		if (line != 0)
+			msg.append(", na liniji ").append(line);
+		Obj obj = MyTab.find(label);
+		if (!MyTab.noObj.equals(obj)) {
+			DumpSymbolTableVisitor visitor = new DumpSymbolTableVisitor();
+			obj.accept(visitor);
+			msg.append("\n").append(visitor.getOutput());
+		}
+		log.info(msg.toString());
+	}
+
 	public void checkParams(String label, SyntaxNode syntaxNode) {
 		Obj obj = MyTab.find(label);
 
@@ -670,40 +695,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		}
 
 		List<Struct> params = designatorParamStack.pop();
-
-		if (label.equals("len")) {
-			if (params.size() != 1) {
-				report_error("len mora imati tacno 1 parametar", syntaxNode);
-				return;
-			}
-
-			if (params.get(0).getKind() != Struct.Array) {
-				report_error("len mora imati parametar tipa niz", syntaxNode);
-			}
-			return;
-		}
-		if (label.equals("ord")) {
-			if (params.size() != 1) {
-				report_error("ord mora imati tacno 1 parametar", syntaxNode);
-				return;
-			}
-
-			if (!params.get(0).equals(MyTab.charType)) {
-				report_error("ord mora imati parametar tipa char", syntaxNode);
-			}
-			return;
-		}
-		if (label.equals("chr")) {
-			if (params.size() != 1) {
-				report_error("chr mora imati tacno 1 parametar", syntaxNode);
-				return;
-			}
-
-			if (!params.get(0).equals(MyTab.intType)) {
-				report_error("chr mora imati parametar tipa int", syntaxNode);
-			}
-			return;
-		}
 
 		Method meth = Method.globalna_lista.get(label);
 
@@ -726,6 +717,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 					return;
 				}
 			} else {
+				return;
+			}
+
+			if (sym.getType().getKind() == Struct.Array && sym.getType().getElemType().equals(MyTab.noType)) {
 				return;
 			}
 
