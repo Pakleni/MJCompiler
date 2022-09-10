@@ -6,10 +6,12 @@ bool pace_bool, gioBool;
 char karakter;
 const char karakter2 = 'q';
 {
-    void f(char ch, int a, int arg, int pace=2) int x;
+    int f(char ch, int a, int arg, int pace=2) int x;
     {
         x = arg;
         print(-pace+1);
+        
+        return x;
     }
 
     void main() int x, i; char c;
@@ -33,6 +35,17 @@ const char karakter2 = 'q';
 
         f(c, x, i);
         f(c, x, i, 3);
+        // ovde ce umreti na previse argumenata
+        f(c, x, i, 3, 3);
+        // ovde ce umreti na premalo argumenata
+        f(c, x);
+        
+        x = f(c, x, i);
+        x = f(c, x, i, 3);
+        // ovde ce umreti na previse argumenata
+        x = f(c, x, i, 3, 3);
+        // ovde ce umreti na premalo argumenata
+        x = f(c, x);
 
         do{
 			if(x <= 0) break;

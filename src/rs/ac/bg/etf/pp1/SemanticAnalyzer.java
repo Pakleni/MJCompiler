@@ -372,6 +372,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				i = sym.getFpPos() - 1;
 			} else if (sym.getFpPos() < 0) {
 				i = meth.for_param_size - sym.getFpPos() - 1;
+
+				if (i >= params.size()) {
+					return;
+				}
 			} else {
 				return;
 			}
