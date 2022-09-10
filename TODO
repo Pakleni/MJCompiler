@@ -82,3 +82,5 @@ contextual conditions:
 
 Ask:
     ☐ currentMethod.setLevel(parCounter); <- da li ce ovo da mi pokvari sve zbog opcionih parametara?
+
+☐ check if you return after every error

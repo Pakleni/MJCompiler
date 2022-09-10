@@ -487,7 +487,80 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 	// endregion
 
-	// TODO: conditions
+	// region "Conditions"
+	public void visit(IfConditionActual ifConditionActual) {
+		ifConditionActual.struct = ifConditionActual.getCondition().struct;
+	}
+
+	public void visit(ConditionSingle conditionSingle) {
+		CondTerm condTerm = conditionSingle.getCondTerm();
+
+		if (!condTerm.struct.equals(MyTab.boolType)) {
+			report_error("CondTerm mora biti tipa boolean", conditionSingle);
+			return;
+		}
+
+		conditionSingle.struct = MyTab.boolType;
+	}
+
+	public void visit(ConditionMultiple conditionMultiple) {
+		CondTerm condTerm = conditionMultiple.getCondTerm();
+		Condition cond = conditionMultiple.getCondition();
+
+		if (!condTerm.struct.equals(MyTab.boolType) || !cond.struct.equals(MyTab.boolType)) {
+			report_error("Condition i CondTerm moraju biti tipa boolean", conditionMultiple);
+			return;
+		}
+
+		conditionMultiple.struct = MyTab.boolType;
+	}
+
+	public void visit(CondTermSingle condTermSingle) {
+		CondFact condFact = condTermSingle.getCondFact();
+
+		if (!condFact.struct.equals(MyTab.boolType)) {
+			report_error("CondFact mora biti tipa boolean", condTermSingle);
+			return;
+		}
+
+		condTermSingle.struct = MyTab.boolType;
+	}
+
+	public void visit(CondTermMultiple condTermMultiple) {
+		CondFact condFact = condTermMultiple.getCondFact();
+		CondTerm condTerm = condTermMultiple.getCondTerm();
+
+		if (!condFact.struct.equals(MyTab.boolType) || !condTerm.struct.equals(MyTab.boolType)) {
+			report_error("CondTerm i CondFact moraju biti tipa boolean", condTermMultiple);
+			return;
+		}
+
+		condTermMultiple.struct = MyTab.boolType;
+	}
+
+	public void visit(CondFactSingle condFactSingle) {
+		Expr expr = condFactSingle.getExpr();
+
+		if (!expr.struct.equals(MyTab.boolType)) {
+			report_error("Expr mora biti tipa boolean", expr);
+			return;
+		}
+
+		condFactSingle.struct = MyTab.boolType;
+	}
+
+	public void visit(CondFactTwo condFactTwo) {
+		Expr expr1 = condFactTwo.getExpr();
+		Expr expr2 = condFactTwo.getExpr1();
+
+		if (!expr1.struct.compatibleWith(expr2.struct)) {
+			report_error("Oba expr-a moraju biti kompatibilni", condFactTwo);
+			return;
+		}
+
+		condFactTwo.struct = MyTab.boolType;
+	}
+	// endregion
 
 	// region "Helpers"
 	Obj currentMethod = null;

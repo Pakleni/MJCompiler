@@ -190,8 +190,8 @@ Statement ::= (StatementSingle) SingleStatement |
 //SingleStatement
 
 SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEMI |
-					(IfStatement) IF LNB IfCondition RNB Statement |
-					(IfElseStatement) IF LNB IfCondition RNB Statement ELSE Statement |
+					(IfStatement) IF  IfCondition Statement |
+					(IfElseStatement) IF IfCondition Statement ELSE Statement |
 					(DoWhileStatement) DoWhileStatementStart Statement WHILE LNB Condition RNB SEMI |
 					(BreakStatement) BREAK SEMI |
 					(ContinueStatement) CONTINUE SEMI |
@@ -203,9 +203,8 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 
 DoWhileStatementStart ::= (DoWhileStatementStart) DO;
 
-IfCondition ::= (IfConditionMultiple) IfCondition OR CondTerm |
-			    (IfConditionSingle) CondTerm |
-				(IfConditionError) error:l {: parser.report_error("Izvrsen oporavak logičkog izraza unutar if konstrukcije do ) u liniji " + lleft, null); :};
+IfCondition ::= (IfConditionActual) LNB Condition RNB |
+				(IfConditionError) error:l RNB {: parser.report_error("Izvrsen oporavak logičkog izraza unutar if konstrukcije do ) u liniji " + lleft, null); :};
 
 //Statements
 Statements ::= LCB StatementList RCB;
