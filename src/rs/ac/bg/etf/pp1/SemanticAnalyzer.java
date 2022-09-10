@@ -18,11 +18,16 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		nVars = MyTab.currentScope.getnVars();
 		MyTab.chainLocalSymbols(program.getProgName().obj);
 		MyTab.closeScope();
+		higherLevel();
+		if (!validMainFound) {
+			report_error("No valid main found", program);
+		}
 	}
 
 	public void visit(ProgName progName) {
 		progName.obj = MyTab.insert(Obj.Prog, progName.getValue(), MyTab.noType);
 		MyTab.openScope();
+		deeperLevel();
 	}
 	// endregion
 
@@ -59,9 +64,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		MyTab.chainLocalSymbols(currentMethod);
 		MyTab.closeScope();
+		higherLevel();
 
 		// currentMethod.setLevel(parCounter);
 
+		if ("main".equals(currentMethod.getName()) && MyTab.noType.equals(currentMethod.getType()) && parCounter == 0
+				&& optCounter == 0) {
+			validMainFound = true;
+		}
 		returnFound = false;
 		currentMethod = null;
 		optCounter = 0;
@@ -70,11 +80,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(MethodTypeName methodTypeName) {
 		String name = methodTypeName.getValue();
+		addParamToLevel(name, methodTypeName);
 		currentMethod = MyTab.insert(Obj.Meth, name, tempMethodType);
 		Method.globalna_lista.put(name, new Method());
 		tempMethodType = null;
 		methodTypeName.obj = currentMethod;
 		MyTab.openScope();
+		deeperLevel();
 		report_info("Obradjuje se funkcija " + methodTypeName.getValue(), methodTypeName);
 	}
 
@@ -93,6 +105,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		ConstDeclItem constDeclItem = constDeclListItem.getConstDeclItem();
 		int value;
 
+		addParamToLevel(constDeclListItem.getLabel(), constDeclListItem);
 		if (constDeclItem instanceof ConstDeclItemNumber) {
 			value = ((ConstDeclItemNumber) constDeclItem).getValue();
 			if (!temporaryType.equals(MyTab.intType)) {
@@ -119,6 +132,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(VarDeclItemItem varDeclItemItem) {
 		varDeclItemItem.obj = MyTab.insert(Obj.Var, varDeclItemItem.getLabel(), temporaryType);
+		addParamToLevel(varDeclItemItem.getLabel(), varDeclItemItem);
 
 		int level = currentMethod == null ? 0 : 1;
 
@@ -128,6 +142,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(VarDeclItemArray varDeclItemArray) {
 		varDeclItemArray.obj = MyTab.insert(Obj.Var, varDeclItemArray.getLabel(),
 				new Struct(Struct.Array, temporaryType));
+		addParamToLevel(varDeclItemArray.getLabel(), varDeclItemArray);
 
 		int level = currentMethod == null ? 0 : 1;
 
@@ -145,6 +160,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		OptArgsItem optArgsItem = optArgs.getOptArgsItem();
 		int value;
 
+		addParamToLevel(optArgs.getLabel(), optArgs);
 		if (optArgsItem instanceof OptArgItemNumber) {
 			value = ((OptArgItemNumber) optArgsItem).getValue();
 			if (!temporaryType.equals(MyTab.intType)) {
@@ -175,6 +191,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		formParItem.obj = MyTab.insert(Obj.Var, formParItem.getLabel(), temporaryType);
 		formParItem.obj.setFpPos(parCounter);
 		Method.globalna_lista.get(currentMethod.getName()).addParam(null);
+		addParamToLevel(formParItem.getLabel(), formParItem);
 	}
 
 	public void visit(FormParArray formParArray) {
@@ -183,6 +200,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				new Struct(Struct.Array, temporaryType));
 		formParArray.obj.setFpPos(parCounter);
 		Method.globalna_lista.get(currentMethod.getName()).addParam(null);
+		addParamToLevel(formParArray.getLabel(), formParArray);
 	}
 	// endregion
 
@@ -597,7 +615,32 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	Obj currentMethod = null;
 	boolean returnFound = false;
 	boolean errorDetected = false;
+	boolean validMainFound = false;
 	int nVars;
+
+	public Stack<List<String>> stackListString = new Stack<>();
+
+	public void deeperLevel() {
+		stackListString.push(new ArrayList<>());
+	}
+
+	public void higherLevel() {
+		stackListString.pop();
+	}
+
+	public boolean addParamToLevel(String label, SyntaxNode syntaxNode) {
+		List<String> lista = stackListString.peek();
+
+		for (String l : lista) {
+			if (l.equals(label)) {
+				report_error("Parametar vec postoji na ovom nivou", syntaxNode);
+				return false;
+			}
+		}
+
+		lista.add(label);
+		return true;
+	}
 
 	Logger log = Logger.getLogger(getClass());
 

@@ -14,9 +14,9 @@ detect usage:
 
 contextual conditions:
     Opšti:
-        ☐ Svako ime u programu mora biti deklarisano pre prvog korišćenja
-        ☐ Ime ne sme biti deklarisano više puta unutar istog opsega
-        ☐ U programu mora postojati metoda sa imenom main. Ona mora biti deklarisana kao void metoda bez argumenata.
+        ✔ Svako ime u programu mora biti deklarisano pre prvog korišćenja @done(22-09-10 23:43)
+        ✔ Ime ne sme biti deklarisano više puta unutar istog opsega @done(22-09-11 00:02)
+        ✔ U programu mora postojati metoda sa imenom main. Ona mora biti deklarisana kao void metoda bez argumenata. @done(22-09-11 00:06)
     standardne metode:
         ✔ chr(e) e mora biti izraz tipa int. @done(22-09-10 20:42)
         ✔ ord(c) c mora biti tipa char. @done(22-09-10 20:40)
