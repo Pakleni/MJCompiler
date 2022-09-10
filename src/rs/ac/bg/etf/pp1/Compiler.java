@@ -13,8 +13,6 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 import rs.ac.bg.etf.pp1.ast.Program;
 import rs.ac.bg.etf.pp1.util.Log4JUtils;
-import rs.etf.pp1.symboltable.Tab;
-import rs.etf.pp1.symboltable.concepts.Obj;
 
 public class Compiler {
 
@@ -24,12 +22,7 @@ public class Compiler {
 	}
 
 	public static void tsdump() {
-		Tab.dump();
-	}
-
-	public static void init() {
-		Tab.init();
-		Tab.currentScope.addToLocals(new Obj(Obj.Type, "bool", SemanticAnalyzer.boolType));
+		MyTab.dump();
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -48,7 +41,7 @@ public class Compiler {
 			Symbol s = p.parse(); // pocetak parsiranja
 
 			Program prog = (Program) (s.value);
-			init();
+			MyTab.init();
 
 			// ispis sintaksnog stabla
 			log.info(prog.toString(""));

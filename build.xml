@@ -9,6 +9,7 @@
 				<exclude name="SemanticAnalyzer.java"/>
 				<exclude name="Compiler.java"/>
 				<exclude name="Method.java"/>
+				<exclude name="MyTab.java"/>
 			</fileset>
 		</delete>
 		<delete>
