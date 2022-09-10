@@ -13,8 +13,6 @@ import java.util.Stack;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
-	int printCallCount = 0;
-	int varDeclCount = 0;
 	Obj currentMethod = null;
 	boolean returnFound = false;
 	boolean errorDetected = false;
@@ -107,26 +105,6 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(MethodDeclTypeVoid methodDeclTypeVoid) {
 		tempMethodType = MyTab.noType;
-	}
-
-	public void visit(ReturnStatement returnStatement) {
-		returnFound = true;
-		Struct currMethType = currentMethod.getType();
-		if (!currMethType.compatibleWith(MyTab.noType)) {
-			report_error("Greska na liniji " + returnStatement.getLine() + " : "
-					+ "tip izraza u return naredbi ne slaze se sa tipom povratne vrednosti funkcije "
-					+ currentMethod.getName(), null);
-		}
-	}
-
-	public void visit(ReturnStatementValue returnStatementValue) {
-		returnFound = true;
-		Struct currMethType = currentMethod.getType();
-		if (!currMethType.compatibleWith(returnStatementValue.getExpr().struct)) {
-			report_error("Greska na liniji " + returnStatementValue.getLine() + " : "
-					+ "tip izraza u return naredbi ne slaze se sa tipom povratne vrednosti funkcije "
-					+ currentMethod.getName(), null);
-		}
 	}
 	// endregion
 
@@ -258,9 +236,15 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		factorDesignatorFun.struct = designator.obj.getType();
 
 		if (designator instanceof DesignatorIdent) {
-			report_error("Ne znam kako da pristup ovome a[3]()", factorDesignatorFun);
+			report_error("Designator mora biti ime funkcije", factorDesignatorFun);
 			return;
 		}
+
+		if (designator.obj.getKind() != Obj.Meth) {
+			report_error("Designator mora biti ime funkcije", factorDesignatorFun);
+			return;
+		}
+
 		String label = designator.obj.getName();
 
 		checkParams(label, factorDesignatorFun);
@@ -273,8 +257,11 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(TermMultiple termMultiple) {
 		termMultiple.struct = termMultiple.getTerm().struct;
 
-		if (!termMultiple.struct.equals(termMultiple.getFactor().struct)) {
-			report_error("Ne poklapaju se tipovi sa leve i desne strane mulop-a", termMultiple);
+		Struct type1 = termMultiple.struct;
+		Struct type2 = termMultiple.getFactor().struct;
+
+		if (!type1.equals(MyTab.intType) || !type2.equals(MyTab.intType)) {
+			report_error("Term i Factor moraju biti tipa int", termMultiple);
 		}
 	}
 
@@ -284,14 +271,24 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 	public void visit(ExprNeg exprNeg) {
 		exprNeg.struct = exprNeg.getTerm().struct;
+
+		Struct type = exprNeg.struct;
+
+		if (!type.equals(MyTab.intType)) {
+			report_error("Expr mora biti tipa int", exprNeg);
+		}
 	}
 
 	public void visit(ExprMultiple exprMultiple) {
 		exprMultiple.struct = exprMultiple.getExpr().struct;
 
-		if (!exprMultiple.struct.equals(exprMultiple.getTerm().struct)) {
-			report_error("Ne poklapaju se tipovi sa leve i desne strane addop-a", exprMultiple);
+		Struct type1 = exprMultiple.struct;
+		Struct type2 = exprMultiple.getTerm().struct;
+
+		if (!type1.equals(MyTab.intType) || !type2.equals(MyTab.intType)) {
+			report_error("Expr i Term moraju biti tipa int", exprMultiple);
 		}
+
 	}
 	// endregion
 
@@ -340,7 +337,177 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 	// endregion
 
-	// TODO: statement
+	// region "Statement"
+	boolean insideDoWhile = false;
+
+	public void visit(PrintStatement printStatement) {
+		Struct type = printStatement.getExpr().struct;
+
+		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
+			report_error("Expr mora biti tipa int, char ili bool", printStatement);
+		}
+	}
+
+	public void visit(PrintStatementValue printStatementValue) {
+		Struct type = printStatementValue.getExpr().struct;
+
+		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
+			report_error("Expr mora biti tipa int, char ili bool", printStatementValue);
+		}
+	}
+
+	public void visit(DesignatorPartInc designatorPartInc) {
+
+		int kind = designatorPartInc.getDesignator().obj.getKind();
+		Struct type = designatorPartInc.getDesignator().obj.getType();
+
+		if (kind != Obj.Elem && kind != Obj.Var) {
+			report_error("Designator mora oznacavati promenljivu, element niza", designatorPartInc);
+			return;
+		}
+
+		if (!type.equals(MyTab.intType)) {
+			report_error("Designator mora biti tipa int", designatorPartInc);
+			return;
+		}
+	}
+
+	public void visit(DesignatorPartDec designatorPartDec) {
+
+		int kind = designatorPartDec.getDesignator().obj.getKind();
+		Struct type = designatorPartDec.getDesignator().obj.getType();
+
+		if (kind != Obj.Elem && kind != Obj.Var) {
+			report_error("Designator mora oznacavati promenljivu, element niza", designatorPartDec);
+			return;
+		}
+
+		if (!type.equals(MyTab.intType)) {
+			report_error("Designator mora biti tipa int", designatorPartDec);
+			return;
+		}
+
+	}
+
+	public void visit(DesignatorPartAssign designatorPartAssign) {
+		int kind = designatorPartAssign.getDesignator().obj.getKind();
+
+		DesignatorPartAssignPart dp = designatorPartAssign.getDesignatorPartAssignPart();
+
+		if (dp instanceof DesignatorPartAssignPartError) {
+			report_error("Oporavak", designatorPartAssign);
+			return;
+		}
+		Struct type1 = designatorPartAssign.getDesignator().obj.getType();
+		Struct type2 = ((DesignatorPartAssignPartExpr) dp).getExpr().struct;
+
+		if (kind != Obj.Elem && kind != Obj.Var) {
+			report_error("Designator mora oznacavati promenljivu, element niza", designatorPartAssign);
+			return;
+		}
+
+		if (!type2.assignableTo(type1)) {
+			report_error("Tip neterminala Expr mora biti kompatibilan pri dodeli sa tipom neterminala Designator",
+					designatorPartAssign);
+			return;
+		}
+	}
+
+	public void visit(DesignatorPartFun designatorPartFun) {
+		Designator designator = designatorPartFun.getDesignator();
+
+		int kind = designator.obj.getKind();
+
+		if (kind != Obj.Meth) {
+			report_error("Designator mora oznacavati promenljivu, element niza", designatorPartFun);
+			return;
+		}
+
+		String label = designator.obj.getName();
+
+		checkParams(label, designatorPartFun);
+	}
+
+	public void visit(ReadStatement readStatement) {
+		int kind = readStatement.getDesignator().obj.getKind();
+		Struct type = readStatement.getDesignator().obj.getType();
+
+		if (kind != Obj.Elem && kind != Obj.Var) {
+			report_error("Designator mora oznacavati promenljivu, element niza", readStatement);
+			return;
+		}
+
+		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
+			report_error("Designator mora biti tipa int, char ili bool", readStatement);
+			return;
+		}
+	}
+
+	public void visit(ReturnStatement returnStatement) {
+		if (currentMethod == null) {
+			report_error("Ne sme postojati izvan tela (statickih) metoda, odnosno globalnih funkcija", returnStatement);
+		}
+
+		returnFound = true;
+		Struct currMethType = currentMethod.getType();
+		if (!currMethType.compatibleWith(MyTab.noType)) {
+			report_error("Greska na liniji " + returnStatement.getLine() + " : "
+					+ "tip izraza u return naredbi ne slaze se sa tipom povratne vrednosti funkcije "
+					+ currentMethod.getName(), null);
+		}
+	}
+
+	public void visit(ReturnStatementValue returnStatementValue) {
+		if (currentMethod == null) {
+			report_error("Ne sme postojati izvan tela (statickih) metoda, odnosno globalnih funkcija",
+					returnStatementValue);
+		}
+
+		returnFound = true;
+		Struct currMethType = currentMethod.getType();
+		if (!currMethType.compatibleWith(returnStatementValue.getExpr().struct)) {
+			report_error("Greska na liniji " + returnStatementValue.getLine() + " : "
+					+ "tip izraza u return naredbi ne slaze se sa tipom povratne vrednosti funkcije "
+					+ currentMethod.getName(), null);
+		}
+	}
+
+	public void visit(ContinueStatement continueStatement) {
+		if (!insideDoWhile) {
+			report_error("Iskaz continue se moze koristiti samo unutar do-while petlje.", continueStatement);
+		}
+	}
+
+	public void visit(BreakStatement breakStatement) {
+		if (!insideDoWhile) {
+			report_error("Iskaz break se moze koristiti samo unutar do-while petlje.", breakStatement);
+		}
+	}
+
+	public void visit(DoWhileStatementStart doWhileStatementStart) {
+		insideDoWhile = true;
+	}
+
+	public void visit(DoWhileStatement doWhileStatement) {
+		insideDoWhile = false;
+
+		if (!doWhileStatement.getCondition().struct.equals(MyTab.boolType)) {
+			report_error("Uslovni izraz Condition mora biti tipa bool", doWhileStatement);
+		}
+	}
+
+	public void visit(IfStatement ifStatement) {
+		if (!ifStatement.getIfCondition().struct.equals(MyTab.boolType)) {
+			report_error("Uslovni izraz Condition mora biti tipa bool", ifStatement);
+		}
+	}
+
+	public void visit(IfElseStatement ifElseStatement) {
+		if (!ifElseStatement.getIfCondition().struct.equals(MyTab.boolType)) {
+			report_error("Uslovni izraz Condition mora biti tipa bool", ifElseStatement);
+		}
+	}
+	// endregion
 
 	// TODO: conditions
 
@@ -353,8 +520,43 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			return;
 		}
 
-		Method meth = Method.globalna_lista.get(label);
 		List<Struct> params = designatorParamStack.pop();
+
+		if (label.equals("len")) {
+			if (params.size() != 1) {
+				report_error("len mora imati tacno 1 parametar", syntaxNode);
+				return;
+			}
+
+			if (params.get(0).getKind() != Struct.Array) {
+				report_error("len mora imati parametar tipa niz", syntaxNode);
+			}
+			return;
+		}
+		if (label.equals("ord")) {
+			if (params.size() != 1) {
+				report_error("ord mora imati tacno 1 parametar", syntaxNode);
+				return;
+			}
+
+			if (!params.get(0).equals(MyTab.charType)) {
+				report_error("ord mora imati parametar tipa char", syntaxNode);
+			}
+			return;
+		}
+		if (label.equals("chr")) {
+			if (params.size() != 1) {
+				report_error("chr mora imati tacno 1 parametar", syntaxNode);
+				return;
+			}
+
+			if (!params.get(0).equals(MyTab.intType)) {
+				report_error("chr mora imati parametar tipa int", syntaxNode);
+			}
+			return;
+		}
+
+		Method meth = Method.globalna_lista.get(label);
 
 		if (params.size() > meth.size() || params.size() < meth.for_param_size) {
 			report_error("Nije dobar broj parametara", syntaxNode);

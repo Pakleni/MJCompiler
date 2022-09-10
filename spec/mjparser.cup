@@ -91,22 +91,24 @@ nonterminal rs.etf.pp1.symboltable.concepts.Struct Type;
 nonterminal Statement;
 nonterminal SingleStatement;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct Expr;
-nonterminal DesignatorStatement, Condition;
+nonterminal DesignatorStatement;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Condition;
 nonterminal Statements;
 nonterminal StatementList;
 nonterminal rs.etf.pp1.symboltable.concepts.Obj Designator;
 nonterminal Assignop;
 nonterminal ActPars;
-nonterminal CondTerm;
-nonterminal CondFact;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct CondTerm;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct CondFact;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct Term;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct Factor;
 nonterminal Relop;
 nonterminal Addop;
 nonterminal Mulop;
-nonterminal DesignatorPart, FunDesignatorPart;
+nonterminal FunDesignatorPart;
 nonterminal DesignatorPartAssignPart;
-nonterminal IfCondition;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct IfCondition;
+nonterminal DoWhileStatementStart;
 precedence left ELSE;
 
 //Program
@@ -190,7 +192,7 @@ Statement ::= (StatementSingle) SingleStatement |
 SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEMI |
 					(IfStatement) IF LNB IfCondition RNB Statement |
 					(IfElseStatement) IF LNB IfCondition RNB Statement ELSE Statement |
-					(DoWhileStatement) DO Statement WHILE LNB Condition RNB SEMI |
+					(DoWhileStatement) DoWhileStatementStart Statement WHILE LNB Condition RNB SEMI |
 					(BreakStatement) BREAK SEMI |
 					(ContinueStatement) CONTINUE SEMI |
 					(ReturnStatement) RETURN SEMI |
@@ -198,6 +200,8 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 					(ReadStatement) READ LNB Designator RNB SEMI |
 					(PrintStatement) PRINT LNB Expr RNB SEMI |
 					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
+
+DoWhileStatementStart ::= (DoWhileStatementStart) DO;
 
 IfCondition ::= (IfConditionMultiple) IfCondition OR CondTerm |
 			    (IfConditionSingle) CondTerm |
@@ -211,12 +215,10 @@ StatementList ::= (StatementListFull) StatementList Statement |
 
 //DesignatorStatement
 
-DesignatorStatement ::= (DesignatorStatement) Designator DesignatorPart;
-
-DesignatorPart ::= (DesignatorPartAssign) Assignop DesignatorPartAssignPart |
-				   (DesignatorPartFun) LNB FunDesignatorPart RNB |
-				   (DesignatorPartInc) INC |
-				   (DesignatorPartDec) DEC;
+DesignatorStatement ::= (DesignatorPartAssign) Designator Assignop DesignatorPartAssignPart |
+				   (DesignatorPartFun) Designator LNB FunDesignatorPart RNB |
+				   (DesignatorPartInc) Designator INC |
+				   (DesignatorPartDec) Designator DEC;
 
 DesignatorPartAssignPart ::= (DesignatorPartAssignPartExpr) Expr |
 						 	 (DesignatorPartAssignPartError) error:l {: parser.report_error("Izvrsen oporavak konstrukcija iskaza dodele do ; u liniji " + lleft, null); :};

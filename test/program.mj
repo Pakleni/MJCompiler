@@ -20,44 +20,50 @@ const char karakter2 = 'q';
         
         read(x);
 
-        if(x > 5)
-        {
-        	pace_bool = false;
-        	c = 'c';
-        }
+        //if(x > 5)
+        //{
+        //	pace_bool = false;
+        //	c = 'c';
+        //}
 
         i = 0;
         
-        do{
-         i++;
-         print(-i);
-        }while(i<size);
+        i = 0 + 2 + f(c, x, 1);
+        
+        //do{
+        // i++;
+        // print(-i);
+        //}while(i<size);
+        
+        chr(x);
+        ord(karakter2);
+        len(ogi);
 
         f(c, x, i);
         f(c, x, i, 3);
         // ovde ce umreti na previse argumenata
-        f(c, x, i, 3, 3);
+        //f(c, x, i, 3, 3);
         // ovde ce umreti na premalo argumenata
-        f(c, x);
+        //f(c, x);
         
         x = f(c, x, i);
         x = f(c, x, i, 3);
         // ovde ce umreti na previse argumenata
-        x = f(c, x, i, 3, 3);
+        //x = f(c, x, i, 3, 3);
         // ovde ce umreti na premalo argumenata
-        x = f(c, x);
+        //x = f(c, x);
 
-        do{
-			if(x <= 0) break;
-			if (0 <= x && x < size)
-			{
-		    	print('a');
-		    }
-		    else if (-size < x && x < 0)
-		    {
-		    	print('b');
-		    }
-		    read(x);
-		}while(true);
+        //do{
+		//	if(x <= 0) break;
+		//	if (0 <= x && x < size)
+		//	{
+		//    	print('a');
+		//    }
+		//    else if (-size < x && x < 0)
+		//    {
+		//    	print('b');
+		//    }
+		//    read(x);
+		//}while(true);
     }
 }
