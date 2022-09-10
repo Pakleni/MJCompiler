@@ -54,6 +54,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (!returnFound && currentMethod.getType() != MyTab.noType) {
 			report_error("Semanticka greska na liniji " + methodDecl.getLine() + ": funcija " + currentMethod.getName()
 					+ " nema return iskaz!", null);
+			return;
 		}
 
 		MyTab.chainLocalSymbols(currentMethod);
@@ -96,16 +97,19 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			value = ((ConstDeclItemNumber) constDeclItem).getValue();
 			if (!temporaryType.equals(MyTab.intType)) {
 				report_error("pogresan tip", constDeclListItem);
+				return;
 			}
 		} else if (constDeclItem instanceof ConstDeclItemChar) {
 			value = ((ConstDeclItemChar) constDeclItem).getValue();
 			if (!temporaryType.equals(MyTab.charType)) {
 				report_error("pogresan tip", constDeclListItem);
+				return;
 			}
 		} else {
 			value = ((ConstDeclItemBool) constDeclItem).getValue();
 			if (!temporaryType.equals(MyTab.boolType)) {
 				report_error("pogresan tip", constDeclListItem);
+				return;
 			}
 		}
 
@@ -145,16 +149,19 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			value = ((OptArgItemNumber) optArgsItem).getValue();
 			if (!temporaryType.equals(MyTab.intType)) {
 				report_error("pogresan tip", optArgs);
+				return;
 			}
 		} else if (optArgsItem instanceof OptArgItemChar) {
 			value = ((OptArgItemChar) optArgsItem).getValue();
 			if (!temporaryType.equals(MyTab.intType)) {
 				report_error("pogresan tip", optArgs);
+				return;
 			}
 		} else {
 			value = ((OptArgItemBool) optArgsItem).getValue();
 			if (!temporaryType.equals(MyTab.intType)) {
 				report_error("pogresan tip", optArgs);
+				return;
 			}
 		}
 
@@ -197,6 +204,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		factorNewArr.struct = new Struct(Struct.Array, type);
 		if (!MyTab.intType.equals(factorNewArr.getExpr().struct)) {
 			report_error("Velicina alokacije mora biti int tip", factorNewArr);
+			return;
 		}
 	}
 
@@ -240,6 +248,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!type1.equals(MyTab.intType) || !type2.equals(MyTab.intType)) {
 			report_error("Term i Factor moraju biti tipa int", termMultiple);
+			return;
 		}
 	}
 
@@ -254,6 +263,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!type.equals(MyTab.intType)) {
 			report_error("Expr mora biti tipa int", exprNeg);
+			return;
 		}
 	}
 
@@ -265,6 +275,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!type1.equals(MyTab.intType) || !type2.equals(MyTab.intType)) {
 			report_error("Expr i Term moraju biti tipa int", exprMultiple);
+			return;
 		}
 
 	}
@@ -279,10 +290,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (type.getKind() != Struct.Array) {
 			report_error("Nije niz", designatorIdent);
+			return;
 		}
 
 		if (!MyTab.intType.equals(designatorIdent.getExpr().struct)) {
 			report_error("Velicina alokacije mora biti int tip", designatorIdent);
+			return;
 		}
 
 		Struct elemType = type.getElemType();
@@ -323,6 +336,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
 			report_error("Expr mora biti tipa int, char ili bool", printStatement);
+			return;
 		}
 	}
 
@@ -331,6 +345,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
 			report_error("Expr mora biti tipa int, char ili bool", printStatementValue);
+			return;
 		}
 	}
 
@@ -424,6 +439,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(ReturnStatement returnStatement) {
 		if (currentMethod == null) {
 			report_error("Ne sme postojati izvan tela (statickih) metoda, odnosno globalnih funkcija", returnStatement);
+			return;
 		}
 
 		returnFound = true;
@@ -432,6 +448,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			report_error("Greska na liniji " + returnStatement.getLine() + " : "
 					+ "tip izraza u return naredbi ne slaze se sa tipom povratne vrednosti funkcije "
 					+ currentMethod.getName(), null);
+			return;
 		}
 	}
 
@@ -439,6 +456,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		if (currentMethod == null) {
 			report_error("Ne sme postojati izvan tela (statickih) metoda, odnosno globalnih funkcija",
 					returnStatementValue);
+			return;
 		}
 
 		returnFound = true;
@@ -447,18 +465,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			report_error("Greska na liniji " + returnStatementValue.getLine() + " : "
 					+ "tip izraza u return naredbi ne slaze se sa tipom povratne vrednosti funkcije "
 					+ currentMethod.getName(), null);
+			return;
 		}
 	}
 
 	public void visit(ContinueStatement continueStatement) {
 		if (!insideDoWhile) {
 			report_error("Iskaz continue se moze koristiti samo unutar do-while petlje.", continueStatement);
+			return;
 		}
 	}
 
 	public void visit(BreakStatement breakStatement) {
 		if (!insideDoWhile) {
 			report_error("Iskaz break se moze koristiti samo unutar do-while petlje.", breakStatement);
+			return;
 		}
 	}
 
@@ -471,18 +492,21 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!doWhileStatement.getCondition().struct.equals(MyTab.boolType)) {
 			report_error("Uslovni izraz Condition mora biti tipa bool", doWhileStatement);
+			return;
 		}
 	}
 
 	public void visit(IfStatement ifStatement) {
 		if (!ifStatement.getIfCondition().struct.equals(MyTab.boolType)) {
 			report_error("Uslovni izraz Condition mora biti tipa bool", ifStatement);
+			return;
 		}
 	}
 
 	public void visit(IfElseStatement ifElseStatement) {
 		if (!ifElseStatement.getIfCondition().struct.equals(MyTab.boolType)) {
 			report_error("Uslovni izraz Condition mora biti tipa bool", ifElseStatement);
+			return;
 		}
 	}
 	// endregion
@@ -555,6 +579,13 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 
 		if (!expr1.struct.compatibleWith(expr2.struct)) {
 			report_error("Oba expr-a moraju biti kompatibilni", condFactTwo);
+			return;
+		}
+
+		if (expr1.struct.getKind() == Struct.Array
+				&& !(condFactTwo.getRelop() instanceof RelopNEQ || condFactTwo.getRelop() instanceof RelopEQEQ)) {
+			report_error("Uz promenljive tipa niza, od relacionih operatora, mogu se koristiti samo != i ==",
+					condFactTwo);
 			return;
 		}
 

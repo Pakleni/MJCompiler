@@ -58,8 +58,8 @@ contextual conditions:
         ✔ Broj formalnih i stvarnih argumenata metode mora biti isti. @done(22-09-10 18:32)
         ✔ Tip svakog stvarnog argumenta mora biti kompatibilan pri dodeli sa tipom svakog formalnog argumenta na odgovarajućoj poziciji. @done(22-09-10 18:32)
     CondFact = Expr Relop Expr.:
-        ☐ Tipovi oba izraza moraju biti kompatibilni.
-        ☐ Uz promenljive tipa niza, od relacionih operatora, mogu se koristiti samo != i ==.
+        ✔ Tipovi oba izraza moraju biti kompatibilni. @done(22-09-10 23:33)
+        ✔ Uz promenljive tipa niza, od relacionih operatora, mogu se koristiti samo != i ==. @done(22-09-10 23:38)
     Expr = ʺ‐ʺ Term.:
         ✔ Term mora biti tipa int. @done(22-09-10 21:11)
     Expr = Expr Addop Term.:
@@ -79,8 +79,3 @@ contextual conditions:
         ☐ Operatori su levo asocijativni.
     Mulop = ʺ*ʺ | ʺ/ʺ | ʺ%ʺ.:
         ☐ Operatori su levo asocijativni.
-
-Ask:
-    ☐ currentMethod.setLevel(parCounter); <- da li ce ovo da mi pokvari sve zbog opcionih parametara?
-
-☐ check if you return after every error
