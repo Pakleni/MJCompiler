@@ -1,8 +1,10 @@
 program p
 const int size = 10;
 int pace, ogi[];
+const bool provera = true;
 bool pace_bool, gioBool;
 char karakter;
+const char karakter2 = 'q';
 {
     void f(char ch, int a, int arg, int pace=2) int x;
     {

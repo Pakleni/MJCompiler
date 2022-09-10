@@ -13,6 +13,8 @@ import java.util.Stack;
 
 public class SemanticAnalyzer extends VisitorAdaptor {
 
+	public static Struct boolType = new Struct(Struct.Bool);
+
 	int printCallCount = 0;
 	int varDeclCount = 0;
 	Obj currentMethod = null;
@@ -143,12 +145,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 			}
 		} else if (constDeclItem instanceof ConstDeclItemChar) {
 			value = ((ConstDeclItemChar) constDeclItem).getValue();
-			if (!temporaryType.equals(Tab.intType)) {
+			if (!temporaryType.equals(Tab.charType)) {
 				report_error("pogresan tip", constDeclListItem);
 			}
 		} else {
 			value = ((ConstDeclItemBool) constDeclItem).getValue();
-			if (!temporaryType.equals(Tab.intType)) {
+			if (!temporaryType.equals(boolType)) {
 				report_error("pogresan tip", constDeclListItem);
 			}
 		}
@@ -233,7 +235,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 
 	public void visit(FactorBool factorBool) {
-		factorBool.struct = new Struct(Struct.Bool);
+		factorBool.struct = boolType;
 	}
 
 	public void visit(FactorNewArr factorNewArr) {
