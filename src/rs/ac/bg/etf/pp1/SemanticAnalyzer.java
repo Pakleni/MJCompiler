@@ -720,6 +720,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				return;
 			}
 
+			detect_usage("upotreba formalnog parametra funkcije", sym.getName(), syntaxNode);
+
 			if (sym.getType().getKind() == Struct.Array && sym.getType().getElemType().equals(MyTab.noType)) {
 				return;
 			}

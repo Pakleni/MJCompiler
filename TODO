@@ -10,7 +10,7 @@ detect usage:
     ✔ globalne promenljive @done(22-09-11 00:50)
     ✔ lokalne promenljive @done(22-09-11 00:50)
     ✔ globalne funkcije (pozivi) @done(22-09-11 00:55)
-    ☐ korišćenje formalnog argumenta funkcije
+    ✔ korišćenje formalnog argumenta funkcije @done(22-09-11 01:50)
 
 contextual conditions:
     Opšti:
