@@ -67,7 +67,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		MyTab.closeScope();
 		higherLevel();
 
-		if ("main".equals(currentMethod.getName()) && MyTab.noType.equals(currentMethod.getType()) && parCounter == 0
+		if ("main".equalsIgnoreCase(currentMethod.getName()) && MyTab.noType.equals(currentMethod.getType())
+				&& parCounter == 0
 				&& optCounter == 0) {
 			validMainFound = true;
 		}
@@ -730,6 +731,10 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 				report_error("Parametar " + i + " se ne poklapa sa definicjom funkcije", syntaxNode);
 			}
 		}
+	}
+
+	public int getNVars() {
+		return nVars;
 	}
 
 	public boolean passed() {

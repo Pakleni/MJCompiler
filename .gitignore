@@ -7,6 +7,8 @@ src/rs/ac/bg/etf/pp1/*
 !src/rs/ac/bg/etf/pp1/Compiler.java
 !src/rs/ac/bg/etf/pp1/Method.java
 !src/rs/ac/bg/etf/pp1/MyTab.java
+!src/rs/ac/bg/etf/pp1/CounterVisitor.java
+!src/rs/ac/bg/etf/pp1/CodeGenerator.java
 spec/*
 !spec/mjlexer.flex
 !spec/mjparser.cup
