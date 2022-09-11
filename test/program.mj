@@ -35,6 +35,10 @@ const bool tacan = true;
 		//operations
 		print(sest + 1);
 		print(sest - 1);
+		print(sest * 2);
+		print(-sest + 1);
+		print(sest / 2);
+		print((sest + 1) % 2);
 		
 		//assignment
 		i = 1;

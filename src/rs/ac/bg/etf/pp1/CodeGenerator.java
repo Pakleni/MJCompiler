@@ -156,4 +156,41 @@ public class CodeGenerator extends VisitorAdaptor {
 			Code.put(Code.sub);
 		}
 	}
+
+	@Override
+	public void visit(TermMultiple termMultiple) {
+		Mulop mulop = termMultiple.getMulop();
+
+		if (mulop instanceof MulopMOD) {
+			Code.put(Code.rem);
+		} else if (mulop instanceof MulopDIV) {
+			Code.put(Code.div);
+		} else {
+			Code.put(Code.mul);
+		}
+	}
+
+	@Override
+	public void visit(CondFactTwo condFactTwo) {
+		Relop relop = condFactTwo.getRelop();
+
+		if (relop instanceof RelopEQEQ) {
+			Code.put(Code.eq);
+		} else if (relop instanceof RelopNEQ) {
+			Code.put(Code.ne);
+		} else if (relop instanceof RelopGR) {
+			Code.put(Code.gt);
+		} else if (relop instanceof RelopGREQ) {
+			Code.put(Code.ge);
+		} else if (relop instanceof RelopLS) {
+			Code.put(Code.lt);
+		} else {
+			Code.put(Code.le);
+		}
+	}
+
+	@Override
+	public void visit(ExprNeg exprNeg) {
+		Code.put(Code.neg);
+	}
 }
