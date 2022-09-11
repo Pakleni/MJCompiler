@@ -741,4 +741,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		return !errorDetected;
 	}
 	// endregion
+
+	// region "Errors"
+	public void visit(InitListElemError e) {
+		errorDetected = true;
+	}
+
+	public void visit(MethodDeclArgsError e) {
+		errorDetected = true;
+	}
+
+	public void visit(IfConditionError e) {
+		errorDetected = true;
+	}
+
+	public void visit(DesignatorPartAssignPartError e) {
+		errorDetected = true;
+	}
+	// endregion
 }
