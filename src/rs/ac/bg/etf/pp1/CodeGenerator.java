@@ -68,7 +68,13 @@ public class CodeGenerator extends VisitorAdaptor {
 	@Override
 	public void visit(FactorNewArr factorNewArr) {
 		Code.put(Code.newarray);
-		Code.put(0);
+
+		if (factorNewArr.getType().struct.equals(MyTab.intType)) {
+			Code.put(1);
+		} else {
+			Code.put(0);
+		}
+
 	}
 
 	@Override
