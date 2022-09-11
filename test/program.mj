@@ -55,5 +55,21 @@ const bool tacan = true;
 		dohvatiIIspisiCetiri();
 		print(dodaj(8, 3));
 		print(dodaj(8));
+		
+		//built-in function
+		//print(ord(q));
+		//print(len(arr));	
+		//print(chr(sest));
+		
+		//inc, dec
+		print(i);
+		i++;
+		print(i);
+		i--;
+		print(i);
+		
+		//read
+		read(i);
+		print(i);
     }
 }

@@ -73,18 +73,20 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	@Override
 	public void visit(DesignatorIdent designatorIdent) {
-		SyntaxNode parent = designatorIdent.getParent();
-		if (DesignatorPartAssign.class != parent.getClass() && DesignatorPartFun.class != parent.getClass()
-				&& FactorDesignatorFun.class != parent.getClass()) {
+		Class<? extends SyntaxNode> parent = designatorIdent.getParent().getClass();
+
+		if (FactorDesignator.class.equals(parent) ||
+				DesignatorIdent.class.equals(parent)) {
 			Code.load(designatorIdent.obj);
 		}
 	}
 
 	@Override
 	public void visit(DesignatorSingle designator) {
-		SyntaxNode parent = designator.getParent();
-		if (DesignatorPartAssign.class != parent.getClass() && DesignatorPartFun.class != parent.getClass()
-				&& FactorDesignatorFun.class != parent.getClass()) {
+		Class<? extends SyntaxNode> parent = designator.getParent().getClass();
+
+		if (FactorDesignator.class.equals(parent) ||
+				DesignatorIdent.class.equals(parent)) {
 			Code.load(designator.obj);
 		}
 	}
@@ -206,4 +208,23 @@ public class CodeGenerator extends VisitorAdaptor {
 	public void visit(ConditionMultiple conditionMultiple) {
 	}
 
+	@Override
+	public void visit(DesignatorPartInc designatorPartInc) {
+		Code.put(Code.inc);
+		Code.put(designatorPartInc.getDesignator().obj.getAdr());
+		Code.put(1);
+	}
+
+	@Override
+	public void visit(DesignatorPartDec designatorPartDec) {
+		Code.put(Code.inc);
+		Code.put(designatorPartDec.getDesignator().obj.getAdr());
+		Code.put(-1);
+	}
+
+	@Override
+	public void visit(ReadStatement readStatement) {
+		Code.put(Code.read);
+		Code.store(readStatement.getDesignator().obj);
+	}
 }
