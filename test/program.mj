@@ -69,11 +69,12 @@ const bool tacan = true;
 		print(dodaj(8));
 		
 		//inc, dec
-		print(i);
-		i++;
-		print(i);
-		i--;
-		print(i);
+		a = 1;
+		print(a);
+		a++;
+		print(a);
+		a--;
+		print(a);
 		
 		//read
 		read(c);

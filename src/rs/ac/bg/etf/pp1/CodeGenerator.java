@@ -209,25 +209,28 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	@Override
 	public void visit(DesignatorPartInc designatorPartInc) {
-		Code.put(Code.inc);
-		Code.put(designatorPartInc.getDesignator().obj.getAdr());
-		Code.put(1);
+		Code.load(designatorPartInc.getDesignator().obj);
+		Code.loadConst(1);
+		Code.put(Code.add);
+		Code.store(designatorPartInc.getDesignator().obj);
 	}
 
 	@Override
 	public void visit(DesignatorPartDec designatorPartDec) {
-		Code.put(Code.inc);
-		Code.put(designatorPartDec.getDesignator().obj.getAdr());
-		Code.put(-1);
+		Code.load(designatorPartDec.getDesignator().obj);
+		Code.loadConst(1);
+		Code.put(Code.sub);
+		Code.store(designatorPartDec.getDesignator().obj);
 	}
 
 	@Override
 	public void visit(PrintStatement printStatement) {
-		Code.put(Code.const_5);
 
 		if (printStatement.getExpr().struct.equals(MyTab.charType)) {
+			Code.put(Code.const_1);
 			Code.put(Code.bprint);
 		} else {
+			Code.put(Code.const_5);
 			Code.put(Code.print);
 		}
 	}
