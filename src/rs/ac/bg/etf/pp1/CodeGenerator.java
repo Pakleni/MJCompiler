@@ -21,6 +21,42 @@ public class CodeGenerator extends VisitorAdaptor {
 
 		actParNum = 0;
 	}
+
+	void leaveFunction() {
+		Code.put(Code.exit);
+		Code.put(Code.return_);
+	}
+	// endregion
+
+	// region "Program"
+	public void visit(ProgName progName) {
+		Obj chr = MyTab.find("chr");
+		chr.setAdr(Code.pc);
+		Code.put(Code.enter);
+		Code.put(1);
+		Code.put(1);
+		Code.put(Code.load_n);
+		Code.loadConst(256);
+		Code.put(Code.rem);
+		leaveFunction();
+
+		Obj len = MyTab.find("len");
+		len.setAdr(Code.pc);
+		Code.put(Code.enter);
+		Code.put(1);
+		Code.put(1);
+		Code.put(Code.load_n);
+		Code.put(Code.arraylength);
+		leaveFunction();
+
+		Obj ord = MyTab.find("ord");
+		ord.setAdr(Code.pc);
+		Code.put(Code.enter);
+		Code.put(1);
+		Code.put(1);
+		Code.put(Code.load_n);
+		leaveFunction();
+	}
 	// endregion
 
 	// region "Method"
@@ -41,8 +77,7 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	@Override
 	public void visit(MethodDecl methodDecl) {
-		Code.put(Code.exit);
-		Code.put(Code.return_);
+		leaveFunction();
 	}
 
 	// endregion
@@ -189,31 +224,42 @@ public class CodeGenerator extends VisitorAdaptor {
 	@Override
 	public void visit(PrintStatement printStatement) {
 		Code.put(Code.const_5);
-		Code.put(Code.print);
+
+		if (printStatement.getExpr().struct.equals(MyTab.charType)) {
+			Code.put(Code.bprint);
+		} else {
+			Code.put(Code.print);
+		}
 	}
 
 	@Override
 	public void visit(PrintStatementValue printStatementValue) {
 		Code.loadConst(printStatementValue.getN2());
-		Code.put(Code.print);
+		if (printStatementValue.getExpr().struct.equals(MyTab.charType)) {
+			Code.put(Code.bprint);
+		} else {
+			Code.put(Code.print);
+		}
 	}
 
 	@Override
 	public void visit(ReadStatement readStatement) {
-		Code.put(Code.read);
+		if (readStatement.getDesignator().obj.getType().equals(MyTab.charType)) {
+			Code.put(Code.bread);
+		} else {
+			Code.put(Code.read);
+		}
 		Code.store(readStatement.getDesignator().obj);
 	}
 
 	@Override
 	public void visit(ReturnStatementValue returnExpr) {
-		Code.put(Code.exit);
-		Code.put(Code.return_);
+		leaveFunction();
 	}
 
 	@Override
 	public void visit(ReturnStatement returnNoExpr) {
-		Code.put(Code.exit);
-		Code.put(Code.return_);
+		leaveFunction();
 	}
 	// endregion
 

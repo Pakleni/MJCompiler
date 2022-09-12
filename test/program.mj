@@ -68,11 +68,6 @@ const bool tacan = true;
 		print(dodaj(8, 3));
 		print(dodaj(8));
 		
-		//built-in function
-		//print(ord(q));
-		//print(len(arr));	
-		//print(chr(sest));
-		
 		//inc, dec
 		print(i);
 		i++;
@@ -81,7 +76,18 @@ const bool tacan = true;
 		print(i);
 		
 		//read
+		read(c);
+		print(c);
 		read(i);
 		print(i);
+		read(c);
+		print(c);
+		
+		//built-in function
+		print(ord(q));
+		print(len(arr));
+		print(chr(7));
+		print(chr(8));	
+		print(chr(299));
     }
 }
