@@ -109,6 +109,7 @@ nonterminal FunDesignatorPart;
 nonterminal DesignatorPartAssignPart;
 nonterminal rs.etf.pp1.symboltable.concepts.Struct IfCondition;
 nonterminal DoWhileStatementStart;
+nonterminal IfStart , ElseStart, OrOperator;
 precedence left ELSE;
 
 //Program
@@ -190,8 +191,8 @@ Statement ::= (StatementSingle) SingleStatement |
 //SingleStatement
 
 SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEMI |
-					(IfStatement) IF  IfCondition Statement |
-					(IfElseStatement) IF IfCondition Statement ELSE Statement |
+					(IfStatement) IfStart IfCondition Statement |
+					(IfElseStatement) IfStart IfCondition Statement ElseStart Statement |
 					(DoWhileStatement) DoWhileStatementStart Statement WHILE LNB Condition RNB SEMI |
 					(BreakStatement) BREAK SEMI |
 					(ContinueStatement) CONTINUE SEMI |
@@ -200,6 +201,10 @@ SingleStatement ::= (SingleStatementDesignatorStatement) DesignatorStatement SEM
 					(ReadStatement) READ LNB Designator RNB SEMI |
 					(PrintStatement) PRINT LNB Expr RNB SEMI |
 					(PrintStatementValue) PRINT LNB Expr COMMA NUMBER RNB SEMI;
+
+IfStart ::= (IfStart) IF;
+
+ElseStart ::= (ElseStart) ELSE;
 
 DoWhileStatementStart ::= (DoWhileStatementStart) DO;
 
@@ -233,8 +238,10 @@ ActPars ::= (ActParsMultiple) ActPars COMMA Expr |
 
 //Condition
 
-Condition ::= (ConditionMultiple) Condition OR CondTerm |
+Condition ::= (ConditionMultiple) Condition OrOperator CondTerm |
 			  (ConditionSingle) CondTerm;
+
+OrOperator ::= (OrOperator) OR;
 
 //CondTerm
 

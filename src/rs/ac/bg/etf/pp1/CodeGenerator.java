@@ -1,5 +1,9 @@
 package rs.ac.bg.etf.pp1;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import rs.ac.bg.etf.pp1.ast.*;
 import rs.etf.pp1.mj.runtime.Code;
 import rs.etf.pp1.symboltable.concepts.Obj;
@@ -60,7 +64,6 @@ public class CodeGenerator extends VisitorAdaptor {
 	// endregion
 
 	// region "Method"
-	@Override
 	public void visit(MethodTypeName methodTypeName) {
 		if ("main".equalsIgnoreCase(methodTypeName.getValue())) {
 			mainPc = Code.pc;
@@ -75,7 +78,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(methodTypeName.obj.getLocalSymbols().size());
 	}
 
-	@Override
 	public void visit(MethodDecl methodDecl) {
 		leaveFunction();
 	}
@@ -83,22 +85,18 @@ public class CodeGenerator extends VisitorAdaptor {
 	// endregion
 
 	// region "Expr"
-	@Override
 	public void visit(FactorNumber factorNumber) {
 		Code.loadConst(factorNumber.getN1());
 	}
 
-	@Override
 	public void visit(FactorChar factorChar) {
 		Code.loadConst(factorChar.getC1());
 	}
 
-	@Override
 	public void visit(FactorBool factorBool) {
 		Code.loadConst(factorBool.getB1());
 	}
 
-	@Override
 	public void visit(FactorNewArr factorNewArr) {
 		Code.put(Code.newarray);
 
@@ -110,7 +108,6 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	}
 
-	@Override
 	public void visit(FactorDesignatorFun factorDesignatorFun) {
 		Obj functionObj = factorDesignatorFun.getDesignator().obj;
 		addOptPars(functionObj.getName());
@@ -120,7 +117,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put2(offset);
 	}
 
-	@Override
 	public void visit(ExprMultiple exprMultiple) {
 		Addop addop = exprMultiple.getAddop();
 
@@ -131,7 +127,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		}
 	}
 
-	@Override
 	public void visit(TermMultiple termMultiple) {
 		Mulop mulop = termMultiple.getMulop();
 
@@ -144,7 +139,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		}
 	}
 
-	@Override
 	public void visit(ExprNeg exprNeg) {
 		Code.put(Code.neg);
 	}
@@ -154,19 +148,16 @@ public class CodeGenerator extends VisitorAdaptor {
 	// region "Function Parameters"
 	int actParNum = 0;
 
-	@Override
 	public void visit(ActParsMultiple actPars) {
 		actParNum++;
 	}
 
-	@Override
 	public void visit(ActParsSingle actPars) {
 		actParNum++;
 	}
 	// endregion
 
 	// region "Designator"
-	@Override
 	public void visit(DesignatorIdent designatorIdent) {
 		Class<? extends SyntaxNode> parent = designatorIdent.getParent().getClass();
 
@@ -176,7 +167,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		}
 	}
 
-	@Override
 	public void visit(DesignatorSingle designator) {
 		Class<? extends SyntaxNode> parent = designator.getParent().getClass();
 
@@ -189,12 +179,10 @@ public class CodeGenerator extends VisitorAdaptor {
 	// endregion
 
 	// region "Statements"
-	@Override
 	public void visit(DesignatorPartAssign designatorPartAssign) {
 		Code.store(designatorPartAssign.getDesignator().obj);
 	}
 
-	@Override
 	public void visit(DesignatorPartFun designatorPartFun) {
 		Obj functionObj = designatorPartFun.getDesignator().obj;
 		addOptPars(functionObj.getName());
@@ -207,7 +195,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		}
 	}
 
-	@Override
 	public void visit(DesignatorPartInc designatorPartInc) {
 		Code.load(designatorPartInc.getDesignator().obj);
 		Code.loadConst(1);
@@ -215,7 +202,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.store(designatorPartInc.getDesignator().obj);
 	}
 
-	@Override
 	public void visit(DesignatorPartDec designatorPartDec) {
 		Code.load(designatorPartDec.getDesignator().obj);
 		Code.loadConst(1);
@@ -223,7 +209,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.store(designatorPartDec.getDesignator().obj);
 	}
 
-	@Override
 	public void visit(PrintStatement printStatement) {
 
 		if (printStatement.getExpr().struct.equals(MyTab.charType)) {
@@ -235,7 +220,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		}
 	}
 
-	@Override
 	public void visit(PrintStatementValue printStatementValue) {
 		Code.loadConst(printStatementValue.getN2());
 		if (printStatementValue.getExpr().struct.equals(MyTab.charType)) {
@@ -245,7 +229,6 @@ public class CodeGenerator extends VisitorAdaptor {
 		}
 	}
 
-	@Override
 	public void visit(ReadStatement readStatement) {
 		if (readStatement.getDesignator().obj.getType().equals(MyTab.charType)) {
 			Code.put(Code.bread);
@@ -255,48 +238,116 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.store(readStatement.getDesignator().obj);
 	}
 
-	@Override
 	public void visit(ReturnStatementValue returnExpr) {
 		leaveFunction();
 	}
 
-	@Override
 	public void visit(ReturnStatement returnNoExpr) {
 		leaveFunction();
 	}
 	// endregion
 
 	// region "Conditions"
-	@Override
-	public void visit(CondFactSingle condFactSingle) {
-	}
+	Stack<List<Integer>> trueStack = new Stack<>();
+	Stack<List<Integer>> falseStack = new Stack<>();
 
-	@Override
 	public void visit(CondFactTwo condFactTwo) {
 		Relop relop = condFactTwo.getRelop();
 
+		int opCode;
+
 		if (relop instanceof RelopEQEQ) {
-			// Code.eq;
+			opCode = Code.eq;
 		} else if (relop instanceof RelopNEQ) {
-			// Code.ne;
+			opCode = Code.ne;
 		} else if (relop instanceof RelopGR) {
-			// Code.gt;
+			opCode = Code.gt;
 		} else if (relop instanceof RelopGREQ) {
-			// Code.ge;
+			opCode = Code.ge;
 		} else if (relop instanceof RelopLS) {
-			// Code.lt;
+			opCode = Code.lt;
 		} else {
-			// Code.le;
+			opCode = Code.le;
 		}
+
+		Code.putFalseJump(opCode, 0);
+		falseStack.peek().add(Code.pc - 2);
 	}
 
-	@Override
-	public void visit(CondTermMultiple condTermMultiple) {
+	public void visit(CondFactSingle condFactSingle) {
+		Code.loadConst(0);
+		Code.putFalseJump(Code.ne, 0);
+		falseStack.peek().add(Code.pc - 2);
 	}
 
-	@Override
-	public void visit(ConditionMultiple conditionMultiple) {
+	public void visit(OrOperator orOperator) {
+		// ako je condition pre mene bio tacan, upasce ovde na stek
+		Code.putJump(0);
+		trueStack.peek().add(Code.pc - 2);
+		// ako je condition pre mene bio netacan, skoci ovde
+		for (Integer i : falseStack.peek()) {
+			Code.fixup(i);
+		}
+		falseStack.peek().clear();
 	}
 	// endregion
 
+	// region "If Else"
+	Stack<List<Integer>> skipElseStack = new Stack<>();
+
+	public void visit(IfConditionActual ifConditionActual) {
+		// na ovom PC pocinje code 1, svi true
+		for (Integer i : trueStack.peek()) {
+			Code.fixup(i);
+		}
+		trueStack.peek().clear();
+	}
+
+	public void visit(ElseStart elseStart) {
+		// na ovom PC zavrsava code 1
+		// ako smo izvrsili code 1 preskoci else:
+		Code.putJump(0);
+		skipElseStack.peek().add(Code.pc - 2);
+
+		// na ovom PC pocinje else
+		// svi false condition-i treba da dodju ovde
+		for (Integer i : falseStack.peek()) {
+			Code.fixup(i);
+		}
+		falseStack.peek().clear();
+	}
+
+	public void visit(IfStart ifStart) {
+		trueStack.add(new ArrayList<>());
+		falseStack.add(new ArrayList<>());
+		skipElseStack.add(new ArrayList<>());
+	}
+
+	public void visit(IfStatement ifStatement) {
+
+		// na ovom PC se izlazi iz ifa
+		// svi false condition-i treba da dodju ovde
+		for (Integer i : falseStack.peek()) {
+			Code.fixup(i);
+		}
+		falseStack.peek().clear();
+
+		trueStack.pop();
+		falseStack.pop();
+		skipElseStack.pop();
+	}
+
+	public void visit(IfElseStatement ifElseStatement) {
+
+		// svi skip else treba da dodju ovde
+		for (Integer i : skipElseStack.peek()) {
+			Code.fixup(i);
+		}
+		skipElseStack.peek().clear();
+
+		trueStack.pop();
+		falseStack.pop();
+		skipElseStack.pop();
+	}
+	// endregion
 }

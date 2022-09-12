@@ -5,6 +5,7 @@ bool b;
 const int sest = 6;
 const char q = 'q';
 const bool tacan = true;
+const bool netacan = false;
 {
 	
 	int dodaj(int a, int b=2) int c; {
@@ -90,5 +91,36 @@ const bool tacan = true;
 		print(chr(7));
 		print(chr(8));	
 		print(chr(299));
+		
+		//if else
+		if (true) print('t');
+		else print('f');
+		
+		if (false) print('f');
+		else print('t');
+		
+		if (true || false) print('t');
+		if (false || false) print('f');
+		if (true && false) print('f');
+		if (true && true) print('t');
+		if (true && false || false) print('f');
+		if (true && true || false) print('t');
+		if (true && false || true) print('t');
+		if (true && false || true || false || true && true || false) print('t');
+		if (true && true && true && false ) print('f');
+		if (true && true && true && true ) print('t');
+		
+		if (q == 'e') {
+			print('f');
+		}
+		else if(q == 'c') {
+			print('f');
+		}
+		else if(q == 'q') {
+			print('t');
+		}
+		else {
+			print('f');
+		}
     }
 }
