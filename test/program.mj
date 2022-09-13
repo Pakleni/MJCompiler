@@ -93,34 +93,97 @@ const bool netacan = false;
 		print(chr(299));
 		
 		//if else
-		if (true) print('t');
-		else print('f');
 		
-		if (false) print('f');
-		else print('t');
+		i = 0;
+		j = 0;
 		
-		if (true || false) print('t');
-		if (false || false) print('f');
-		if (true && false) print('f');
-		if (true && true) print('t');
-		if (true && false || false) print('f');
-		if (true && true || false) print('t');
-		if (true && false || true) print('t');
-		if (true && false || true || false || true && true || false) print('t');
-		if (true && true && true && false ) print('f');
-		if (true && true && true && true ) print('t');
+		if (true) i++;
+		else j++;
+		
+		if (false) j++;
+		else i++;
+		
+		if (true || false) i++;
+		if (false || false) j++;
+		if (true && false) j++;
+		if (true && true) i++;
+		if (true && false || false) j++;
+		if (true && true || false) i++;
+		if (true && false || true) i++;
+		if (true && false || false || false || true && true || false) i++;
+		if (true && true && true && false ) j++;
+		if (true && true && true && true ) i++;
 		
 		if (q == 'e') {
-			print('f');
+			j++;
 		}
 		else if(q == 'c') {
-			print('f');
+			j++;
 		}
 		else if(q == 'q') {
-			print('t');
+			i++;
 		}
 		else {
-			print('f');
+			j++;
 		}
+
+		print(i);
+		print(eol);
+
+		print(j);
+		print(eol);
+		
+		//do while
+		i = 0;
+		do {
+			i++;
+		}
+		while (i < sest);
+		
+		print(i);
+		i = 0;
+		j = 0;
+		a = 0;
+		do {
+			i++;
+			j = 0;
+			do {
+				j++;
+				a++;
+			}
+			while (j < sest);
+		}
+		while (i < sest);
+		print(a);
+		
+		i = 0;
+		print(eol);
+		print(eol);
+		do {
+			i++;
+			if ((i % 2) == 0) {
+				print(i);
+				print(eol);
+			}
+		}
+		while (i < 12);
+		
+		i = 0;
+		print(eol);
+		print(eol);
+		do {
+			i++;
+			if ((i % 2) == 1) {
+				continue;
+			}
+			
+			print(i);
+			print(eol);
+			
+			if (i == 12) {
+				break;
+			}
+		}
+		while (i < 36);
     }
 }

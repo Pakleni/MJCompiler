@@ -30,6 +30,13 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.put(Code.exit);
 		Code.put(Code.return_);
 	}
+
+	public void fixup(Stack<List<Integer>> st) {
+		for (Integer i : st.peek()) {
+			Code.fixup(i);
+		}
+		st.peek().clear();
+	}
 	// endregion
 
 	// region "Program"
@@ -285,10 +292,7 @@ public class CodeGenerator extends VisitorAdaptor {
 		Code.putJump(0);
 		trueStack.peek().add(Code.pc - 2);
 		// ako je condition pre mene bio netacan, skoci ovde
-		for (Integer i : falseStack.peek()) {
-			Code.fixup(i);
-		}
-		falseStack.peek().clear();
+		fixup(falseStack);
 	}
 	// endregion
 
@@ -297,10 +301,7 @@ public class CodeGenerator extends VisitorAdaptor {
 
 	public void visit(IfConditionActual ifConditionActual) {
 		// na ovom PC pocinje code 1, svi true
-		for (Integer i : trueStack.peek()) {
-			Code.fixup(i);
-		}
-		trueStack.peek().clear();
+		fixup(trueStack);
 	}
 
 	public void visit(ElseStart elseStart) {
@@ -311,10 +312,7 @@ public class CodeGenerator extends VisitorAdaptor {
 
 		// na ovom PC pocinje else
 		// svi false condition-i treba da dodju ovde
-		for (Integer i : falseStack.peek()) {
-			Code.fixup(i);
-		}
-		falseStack.peek().clear();
+		fixup(falseStack);
 	}
 
 	public void visit(IfStart ifStart) {
@@ -327,10 +325,7 @@ public class CodeGenerator extends VisitorAdaptor {
 
 		// na ovom PC se izlazi iz ifa
 		// svi false condition-i treba da dodju ovde
-		for (Integer i : falseStack.peek()) {
-			Code.fixup(i);
-		}
-		falseStack.peek().clear();
+		fixup(falseStack);
 
 		trueStack.pop();
 		falseStack.pop();
@@ -340,14 +335,52 @@ public class CodeGenerator extends VisitorAdaptor {
 	public void visit(IfElseStatement ifElseStatement) {
 
 		// svi skip else treba da dodju ovde
-		for (Integer i : skipElseStack.peek()) {
-			Code.fixup(i);
-		}
-		skipElseStack.peek().clear();
+		fixup(skipElseStack);
 
 		trueStack.pop();
 		falseStack.pop();
 		skipElseStack.pop();
+	}
+	// endregion
+
+	// region "Do While"
+	Stack<List<Integer>> breakStack = new Stack<>();
+	Stack<List<Integer>> continueStack = new Stack<>();
+	Stack<Integer> whileStartStack = new Stack<>();
+
+	public void visit(ContinueStatement continueStatement) {
+		Code.putJump(0);
+		continueStack.peek().add(Code.pc - 2);
+	}
+
+	public void visit(BreakStatement breakStatement) {
+		Code.putJump(0);
+		breakStack.peek().add(Code.pc - 2);
+	}
+
+	public void visit(DoWhileStatementStart doWhileStatementStart) {
+		trueStack.add(new ArrayList<>());
+		falseStack.add(new ArrayList<>());
+		continueStack.add(new ArrayList<>());
+		breakStack.add(new ArrayList<>());
+
+		whileStartStack.add(Code.pc);
+	}
+
+	public void visit(DoWhileWhile doWhileWhile) {
+		fixup(continueStack);
+	}
+
+	public void visit(DoWhileStatement doWhileStatement) {
+		fixup(trueStack);
+		Code.putJump(whileStartStack.pop());
+		fixup(falseStack);
+		fixup(breakStack);
+
+		trueStack.pop();
+		falseStack.pop();
+		continueStack.pop();
+		breakStack.pop();
 	}
 	// endregion
 }
