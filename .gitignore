@@ -10,5 +10,6 @@ src/rs/ac/bg/etf/pp1/*
 !src/rs/ac/bg/etf/pp1/CounterVisitor.java
 !src/rs/ac/bg/etf/pp1/CodeGenerator.java
 spec/*
+test/program.obj
 !spec/mjlexer.flex
 !spec/mjparser.cup
