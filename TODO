@@ -49,11 +49,11 @@ contextual conditions:
         ✔ Ako neterminal Expr nedostaje, tekuća metoda mora biti deklarisana kao void. @done(22-09-10 19:45)
         ✔ Ne sme postojati izvan tela (statičkih) metoda, odnosno globalnih funkcija. @done(22-09-10 19:49)
     SingleStatement = ʺifʺ ʺ(ʺ Condition ʺ)ʺ Statement [ʺelseʺ Statement].:
-        ☐ Naredba if – ukoliko je vrednost uslovnog izraza Condition true, izvršavaju se naredbe u if grani, u suprotnom izvršavaju se naredbe u else grani, ako je navedena.
+        ✔ Naredba if – ukoliko je vrednost uslovnog izraza Condition true, izvršavaju se naredbe u if grani, u suprotnom izvršavaju se naredbe u else grani, ako je navedena. @done(22-09-13 14:36)
         ✔ Tip uslovnog izraza Condition mora biti bool. @done(22-09-10 20:56)
     SingleStatement = ʺdoʺ {Statement} ʺwhileʺ ʺ(ʺ Condition ʺ)ʺ ʺ;ʺ .:
         ✔ Uslovni izraz Condition mora biti tipa bool. @done(22-09-10 20:55)
-        ☐ Po završetku tela petlje (osim ukoliko se ne naiđe na break) proverava se zadati uslov. Ukoliko je uslov ispunjen skače se na početak petlje, dok se u suprotnom izlazi iz petlje.
+        ✔ Po završetku tela petlje (osim ukoliko se ne naiđe na break) proverava se zadati uslov. Ukoliko je uslov ispunjen skače se na početak petlje, dok se u suprotnom izlazi iz petlje. @done(22-09-13 14:36)
     ActPars = Expr {ʺ,ʺ Expr}.:
         ✔ Broj formalnih i stvarnih argumenata metode mora biti isti. @done(22-09-10 18:32)
         ✔ Tip svakog stvarnog argumenta mora biti kompatibilan pri dodeli sa tipom svakog formalnog argumenta na odgovarajućoj poziciji. @done(22-09-10 18:32)
@@ -74,8 +74,8 @@ contextual conditions:
         ✔ Tip neterminala Designator mora biti niz. @done(22-09-10 20:57)
         ✔ Tip neterminala Expr mora biti int. @done(22-09-10 20:57)
     Assignop = ʺ=ʺ.:
-        ☐ Operator dodele vrednosti je desno asocijativan.
+        ✔ Operator dodele vrednosti je desno asocijativan. @done(22-09-13 14:36)
     Addop = ʺ+ʺ | ʺ‐ʺ.:
-        ☐ Operatori su levo asocijativni.
+        ✔ Operatori su levo asocijativni. @done(22-09-13 14:36)
     Mulop = ʺ*ʺ | ʺ/ʺ | ʺ%ʺ.:
-        ☐ Operatori su levo asocijativni.
+        ✔ Operatori su levo asocijativni. @done(22-09-13 14:36)
