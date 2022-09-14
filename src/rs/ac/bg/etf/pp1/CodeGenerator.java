@@ -203,17 +203,27 @@ public class CodeGenerator extends VisitorAdaptor {
 	}
 
 	public void visit(DesignatorPartInc designatorPartInc) {
-		Code.load(designatorPartInc.getDesignator().obj);
+		Designator designator = designatorPartInc.getDesignator();
+		if (designator instanceof DesignatorIdent) {
+			Code.put(Code.dup2);
+		}
+
+		Code.load(designator.obj);
 		Code.loadConst(1);
 		Code.put(Code.add);
-		Code.store(designatorPartInc.getDesignator().obj);
+		Code.store(designator.obj);
 	}
 
 	public void visit(DesignatorPartDec designatorPartDec) {
-		Code.load(designatorPartDec.getDesignator().obj);
+		Designator designator = designatorPartDec.getDesignator();
+		if (designator instanceof DesignatorIdent) {
+			Code.put(Code.dup2);
+		}
+
+		Code.load(designator.obj);
 		Code.loadConst(1);
 		Code.put(Code.sub);
-		Code.store(designatorPartDec.getDesignator().obj);
+		Code.store(designator.obj);
 	}
 
 	public void visit(PrintStatement printStatement) {
