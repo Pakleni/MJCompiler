@@ -29,6 +29,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		progName.obj = MyTab.insert(Obj.Prog, progName.getValue(), MyTab.noType);
 		MyTab.openScope();
 		deeperLevel();
+		insideDoWhile.add(false);
 	}
 	// endregion
 
@@ -356,7 +357,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	// endregion
 
 	// region "Statement"
-	boolean insideDoWhile = false;
+	Stack<Boolean> insideDoWhile = new Stack<>();
 
 	public void visit(PrintStatement printStatement) {
 		Struct type = printStatement.getExpr().struct;
@@ -501,25 +502,25 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 
 	public void visit(ContinueStatement continueStatement) {
-		if (!insideDoWhile) {
+		if (!insideDoWhile.peek()) {
 			report_error("Iskaz continue se moze koristiti samo unutar do-while petlje.", continueStatement);
 			return;
 		}
 	}
 
 	public void visit(BreakStatement breakStatement) {
-		if (!insideDoWhile) {
+		if (!insideDoWhile.peek()) {
 			report_error("Iskaz break se moze koristiti samo unutar do-while petlje.", breakStatement);
 			return;
 		}
 	}
 
 	public void visit(DoWhileStatementStart doWhileStatementStart) {
-		insideDoWhile = true;
+		insideDoWhile.push(true);
 	}
 
 	public void visit(DoWhileStatement doWhileStatement) {
-		insideDoWhile = false;
+		insideDoWhile.pop();
 
 		if (!doWhileStatement.getCondition().struct.equals(MyTab.boolType)) {
 			report_error("Uslovni izraz Condition mora biti tipa bool", doWhileStatement);
