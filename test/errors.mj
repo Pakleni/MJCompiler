@@ -1,0 +1,60 @@
+program p
+const integer i;
+const int pogresan = 'c';
+int j;
+char j, c;
+char z[];
+{
+
+	int calc(integer i, int j = 'c',) {
+	}
+	
+	int calc2() {
+		return 'v';
+	}
+	
+    void mainp() int p, p, p, p;
+    {
+		if (j >> 2) {
+			j = 2 > 3 , ;
+		}
+		
+		j = 'c';
+		
+		calc(1,2,3,4);
+		z = new char[true];
+		
+		z();
+		izracunaj_ovo();
+		
+		j[6] = -'c' + 'c' * 'c';
+		
+		z['c'] = 6;
+		
+		print(z);
+		
+		z++;
+		c++;
+		
+		read(pogresan);
+		
+		continue;
+		break;
+		
+		do {
+		}
+		while(8);
+		
+		if (6 || 7){
+		}
+		
+		if (6 && 7){
+		}
+		
+		if (6 > 'c'){
+		}
+		
+		if (z > z){
+		}
+    }
+}

@@ -21,7 +21,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		MyTab.closeScope();
 		higherLevel();
 		if (!validMainFound) {
-			report_error("No valid main found", program);
+			report_error("No valid main found", null);
 		}
 	}
 
@@ -362,7 +362,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Struct type = printStatement.getExpr().struct;
 
 		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
-			report_error("Expr mora biti tipa int, char ili bool", printStatement);
+			report_error("Printov Expr mora biti tipa int, char ili bool", printStatement);
 			return;
 		}
 	}
@@ -371,7 +371,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		Struct type = printStatementValue.getExpr().struct;
 
 		if (!(type.equals(MyTab.intType) || type.equals(MyTab.charType) || type.equals(MyTab.boolType))) {
-			report_error("Expr mora biti tipa int, char ili bool", printStatementValue);
+			report_error("Printov Expr mora biti tipa int, char ili bool", printStatementValue);
 			return;
 		}
 	}
@@ -410,12 +410,14 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 
 	public void visit(DesignatorPartAssign designatorPartAssign) {
+		if (designatorPartAssign.getDesignator().obj == null)
+			return;
+
 		int kind = designatorPartAssign.getDesignator().obj.getKind();
 
 		DesignatorPartAssignPart dp = designatorPartAssign.getDesignatorPartAssignPart();
 
 		if (dp instanceof DesignatorPartAssignPartError) {
-			report_error("Oporavak", designatorPartAssign);
 			return;
 		}
 		Struct type1 = designatorPartAssign.getDesignator().obj.getType();
@@ -439,7 +441,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		int kind = designator.obj.getKind();
 
 		if (kind != Obj.Meth) {
-			report_error("Designator mora oznacavati promenljivu, element niza", designatorPartFun);
+			report_error("Designator mora oznacavati metodu", designatorPartFun);
 			return;
 		}
 
@@ -526,7 +528,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	}
 
 	public void visit(IfStatement ifStatement) {
-		if (!ifStatement.getIfCondition().struct.equals(MyTab.boolType)) {
+		if (ifStatement.getIfCondition().struct != null
+				&& !ifStatement.getIfCondition().struct.equals(MyTab.boolType)) {
 			report_error("Uslovni izraz Condition mora biti tipa bool", ifStatement);
 			return;
 		}
@@ -571,7 +574,7 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(CondTermSingle condTermSingle) {
 		CondFact condFact = condTermSingle.getCondFact();
 
-		if (!condFact.struct.equals(MyTab.boolType)) {
+		if (condFact.struct != null && !condFact.struct.equals(MyTab.boolType)) {
 			report_error("CondFact mora biti tipa boolean", condTermSingle);
 			return;
 		}
@@ -583,7 +586,8 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 		CondFact condFact = condTermMultiple.getCondFact();
 		CondTerm condTerm = condTermMultiple.getCondTerm();
 
-		if (!condFact.struct.equals(MyTab.boolType) || !condTerm.struct.equals(MyTab.boolType)) {
+		if (condFact.struct != null && !condFact.struct.equals(MyTab.boolType)
+				|| !condTerm.struct.equals(MyTab.boolType)) {
 			report_error("CondTerm i CondFact moraju biti tipa boolean", condTermMultiple);
 			return;
 		}
@@ -745,18 +749,22 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	// region "Errors"
 	public void visit(InitListElemError e) {
 		errorDetected = true;
+		report_error("Izvrsen oporavak definicije globalne promenljive do ;", e);
 	}
 
 	public void visit(MethodDeclArgsError e) {
 		errorDetected = true;
+		report_error("Izvrsen oporavak deklaracija formalnog parametra funkcije do , ili )", e);
 	}
 
 	public void visit(IfConditionError e) {
 		errorDetected = true;
+		report_error("Izvrsen oporavak logičkog izraza unutar if konstrukcije do )", e);
 	}
 
 	public void visit(DesignatorPartAssignPartError e) {
 		errorDetected = true;
+		report_error("Izvrsen oporavak konstrukcija iskaza dodele do ;", e);
 	}
 	// endregion
 }
