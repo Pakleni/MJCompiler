@@ -134,20 +134,12 @@ public class SemanticAnalyzer extends VisitorAdaptor {
 	public void visit(VarDeclItemItem varDeclItemItem) {
 		varDeclItemItem.obj = MyTab.insert(Obj.Var, varDeclItemItem.getLabel(), temporaryType);
 		addParamToLevel(varDeclItemItem.getLabel(), varDeclItemItem);
-
-		int level = currentMethod == null ? 0 : 1;
-
-		varDeclItemItem.obj.setLevel(level);
 	}
 
 	public void visit(VarDeclItemArray varDeclItemArray) {
 		varDeclItemArray.obj = MyTab.insert(Obj.Var, varDeclItemArray.getLabel(),
 				new Struct(Struct.Array, temporaryType));
 		addParamToLevel(varDeclItemArray.getLabel(), varDeclItemArray);
-
-		int level = currentMethod == null ? 0 : 1;
-
-		varDeclItemArray.obj.setLevel(level);
 	}
 	// endregion
 
